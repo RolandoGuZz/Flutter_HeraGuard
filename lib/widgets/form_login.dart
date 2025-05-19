@@ -53,7 +53,6 @@ class _FormLoginState extends State<FormLogin> {
     return Form(
       key: widget.formKey,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           _buildEmailField(),
           SizedBox(height: 20),

@@ -64,7 +64,6 @@ class _FormRegisterState extends State<FormRegister> {
     return Form(
       key: widget.formKey,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           _buildNameField(),
           SizedBox(height: 20),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:heraguard/models/menu_model.dart';
-import 'package:heraguard/screens/login_screen.dart';
+import 'package:heraguard/screens/login/login_screen.dart';
 import 'package:heraguard/screens/screens.dart';
 
 class MyRoutes {

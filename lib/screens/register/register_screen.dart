@@ -82,28 +82,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(18.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Column(
-                  children: [
-                    Icon(
-                      Icons.security,
-                      size: 70,
-                      color: Color.fromRGBO(35, 150, 230, 1),
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      "Únete a nosotros",
-                      style: TextStyle(
-                        fontSize: 30,
-                        color: Color.fromRGBO(35, 150, 230, 1),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                Icon(
+                  Icons.security,
+                  size: 70,
+                  color: Color.fromRGBO(35, 150, 230, 1),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  "Únete a nosotros",
+                  style: TextStyle(
+                    fontSize: 30,
+                    color: Color.fromRGBO(35, 150, 230, 1),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 SizedBox(height: 30),
                 FormRegister(

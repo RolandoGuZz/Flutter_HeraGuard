@@ -1,18 +1,42 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-Future<List<Map<String, dynamic>>> getAppointments() async {
-  final currentUser = FirebaseAuth.instance.currentUser;
+class AppointmentService {
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  if (currentUser == null) return [];
+  static Future<List<Map<String, dynamic>>> getAppointments() async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) return [];
 
-  final uid = currentUser.uid;
-  final appointmentsRef = FirebaseFirestore.instance
-      .collection('users')
-      .doc(uid)
-      .collection('appointments');
+    final snapshot = await _firestore
+        .collection('users')
+        .doc(currentUser.uid)
+        .collection('appointments')
+        .get();
 
-  final snapshot = await appointmentsRef.get();
+    return snapshot.docs.map((doc) => doc.data()).toList();
+  }
 
-  return snapshot.docs.map((doc) => doc.data()).toList();
+  static Future<void> addAppointment({
+    required String date,
+    required String time,
+    required String doctor,
+    required String address,
+  }) async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) throw Exception('Usuario no autenticado');
+
+    await _firestore
+        .collection('users')
+        .doc(currentUser.uid)
+        .collection('appointments')
+        .add({
+      'date': date,
+      'time': time,
+      'doctor': doctor,
+      'address': address,
+      'createdAt': FieldValue.serverTimestamp(), // Campo adicional útil
+    });
+  }
 }

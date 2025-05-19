@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:heraguard/services/appointment_service.dart';
 import 'package:heraguard/widgets/appbar_widget.dart';
 import 'package:intl/intl.dart';
 
@@ -21,20 +20,12 @@ class _AgregarCitaState extends State<AgregarCita> {
   final _formKey = GlobalKey<FormState>();
 
   Future<void> _guardarCita() async {
-    final user = FirebaseAuth.instance.currentUser;
-    // if (user == null) return;
-    final uid = user!.uid;
-    final citaData = {
-      'date': _dateController.text,
-      'time': _timeController.text,
-      'doctor': _doctorController.text,
-      'address': _addressController.text,
-    };
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .collection('appointments')
-        .add(citaData);
+    await AppointmentService.addAppointment(
+      date: _dateController.text,
+      time: _timeController.text,
+      doctor: _doctorController.text,
+      address: _addressController.text,
+    );
     ScaffoldMessenger.of(
       // ignore: use_build_context_synchronously
       context,
@@ -55,21 +46,22 @@ class _AgregarCitaState extends State<AgregarCita> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
+      firstDate: DateTime(2025),
       lastDate: DateTime(2100),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: Color.fromRGBO(35, 150, 230, 1),
-            ),
-          ),
-          child: child!,
-        );
-      },
     );
     if (picked != null) {
       _dateController.text = DateFormat('dd/MM/yyyy').format(picked);
+    }
+  }
+
+  Future<void> _selectTime() async {
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (time != null) {
+      // ignore: use_build_context_synchronously
+      _timeController.text = time.format(context);
     }
   }
 
@@ -91,22 +83,19 @@ class _AgregarCitaState extends State<AgregarCita> {
                     style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 20),
-                  _buildTextField(_dateController, 'Fecha', Icons.date_range, _selectDate, true),
+                  _buildTextField(
+                    _dateController,
+                    'Fecha',
+                    Icons.date_range,
+                    _selectDate,
+                    true,
+                  ),
                   SizedBox(height: 20),
                   _buildTextField(
                     _timeController,
                     'Hora',
                     Icons.lock_clock,
-                    () async {
-                      final time = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.now(),
-                      );
-                      if (time != null) {
-                        // ignore: use_build_context_synchronously
-                        _timeController.text = time.format(context);
-                      }
-                    },
+                    _selectTime,
                     true,
                   ),
                   SizedBox(height: 20),
@@ -154,10 +143,7 @@ class _AgregarCitaState extends State<AgregarCita> {
       cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(
-          color: Colors.black,
-          fontWeight: FontWeight.bold,
-        ),
+        labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         prefixIcon: Icon(icon),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.black),

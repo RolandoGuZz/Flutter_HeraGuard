@@ -16,12 +16,12 @@ class _CitasScreenState extends State<CitasScreen> {
   @override
   void initState() {
     super.initState();
-    _appointmentsFuture = getAppointments();
+    _appointmentsFuture = AppointmentService.getAppointments();
   }
 
   void _recargarCitas() {
     setState(() {
-      _appointmentsFuture = getAppointments();
+      _appointmentsFuture = AppointmentService.getAppointments();
     });
   }
 
@@ -57,19 +57,19 @@ class _CitasScreenState extends State<CitasScreen> {
                           ),
                           child: ListTile(
                             title: Text(
-                              'Doctor: ${appointment['doctor'] ?? 'Sin doctor'}',
+                              'Doctor: ${appointment['doctor']}',
                             ),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Fecha: ${appointment['date'] ?? 'Desconocida'}',
+                                  'Fecha: ${appointment['date']}',
                                 ),
                                 Text(
-                                  'Hora: ${appointment['time'] ?? 'Desconocida'}',
+                                  'Hora: ${appointment['time']}',
                                 ),
                                 Text(
-                                  'Dirección: ${appointment['address'] ?? 'Desconocida'}',
+                                  'Dirección: ${appointment['address']}',
                                 ),
                               ],
                             ),

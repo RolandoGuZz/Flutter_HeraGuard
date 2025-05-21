@@ -14,7 +14,13 @@ class MedicamentosScreen extends StatelessWidget {
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: [Text('Tratamientos Médicos', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),)],
+          children: [
+            Text(
+              'Tratamientos Médicos',
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+          ],
         ),
       ),
       floatingActionButton: Row(
@@ -25,7 +31,9 @@ class MedicamentosScreen extends StatelessWidget {
                 () => {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => AgregarMedicamento()),
+                    MaterialPageRoute(
+                      builder: (context) => AgregarMedicamento(),
+                    ),
                   ),
                 },
             backgroundColor: Colors.green,

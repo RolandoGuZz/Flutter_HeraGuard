@@ -34,12 +34,12 @@ class _CitasScreenState extends State<CitasScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 20),
-            const Text(
+            SizedBox(height: 20),
+            Text(
               'Citas Médicas',
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Expanded(
               child: FutureBuilder(
                 future: _appointmentsFuture,
@@ -104,7 +104,7 @@ class _CitasScreenState extends State<CitasScreen> {
               }
             },
             backgroundColor: Colors.green,
-            child: const Icon(Icons.plus_one, color: Colors.white, size: 30),
+            child: Icon(Icons.plus_one, color: Colors.white, size: 30),
           ),
         ],
       ),

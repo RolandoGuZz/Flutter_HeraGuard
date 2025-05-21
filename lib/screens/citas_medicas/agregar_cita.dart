@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:heraguard/services/appointment_service.dart';
+import 'package:heraguard/functions/functions.dart';
 import 'package:heraguard/widgets/appbar_widget.dart';
-import 'package:intl/intl.dart';
+import 'package:heraguard/widgets/custom_text_field.dart';
 
 class AgregarCita extends StatefulWidget {
   const AgregarCita({super.key});
@@ -15,55 +15,8 @@ class _AgregarCitaState extends State<AgregarCita> {
   final _timeController = TextEditingController();
   final _doctorController = TextEditingController();
   final _addressController = TextEditingController();
-  final onTapFunction = Function;
 
   final _formKey = GlobalKey<FormState>();
-
-  Future<void> _guardarCita() async {
-    await AppointmentService.addAppointment(
-      date: _dateController.text,
-      time: _timeController.text,
-      doctor: _doctorController.text,
-      address: _addressController.text,
-    );
-    ScaffoldMessenger.of(
-      // ignore: use_build_context_synchronously
-      context,
-    ).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Cita guardada con éxito',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Color.fromRGBO(35, 150, 230, 1),
-      ),
-    );
-    // ignore: use_build_context_synchronously
-    Navigator.pop(context, true);
-  }
-
-  Future<void> _selectDate() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2025),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) {
-      _dateController.text = DateFormat('dd/MM/yyyy').format(picked);
-    }
-  }
-
-  Future<void> _selectTime() async {
-    final time = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    if (time != null) {
-      // ignore: use_build_context_synchronously
-      _timeController.text = time.format(context);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,30 +36,53 @@ class _AgregarCitaState extends State<AgregarCita> {
                     style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 20),
-                  _buildTextField(
-                    _dateController,
-                    'Fecha',
-                    Icons.date_range,
-                    _selectDate,
-                    true,
+                  CustomTextField(
+                    controller: _dateController,
+                    label: 'Fecha',
+                    icon: Icons.calendar_today,
+                    onTap:
+                        () => Functions.showCalendar(
+                          context: context,
+                          controller: _dateController,
+                        ),
+                    readOnly: true,
                   ),
                   SizedBox(height: 20),
-                  _buildTextField(
-                    _timeController,
-                    'Hora',
-                    Icons.lock_clock,
-                    _selectTime,
-                    true,
+                  CustomTextField(
+                    controller: _timeController,
+                    label: 'Hora',
+                    icon: Icons.access_time,
+                    onTap:
+                        () => Functions.showTime(
+                          context: context,
+                          controller: _timeController,
+                        ),
+                    readOnly: true,
                   ),
                   SizedBox(height: 20),
-                  _buildTextField(_doctorController, 'Doctor', Icons.person),
+                  CustomTextField(
+                    controller: _doctorController,
+                    label: 'Doctor',
+                    icon: Icons.person,
+                  ),
                   SizedBox(height: 20),
-                  _buildTextField(_addressController, 'Dirección', Icons.place),
+                  CustomTextField(
+                    controller: _addressController,
+                    label: 'Dirección',
+                    icon: Icons.place,
+                  ),
                   SizedBox(height: 30),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _guardarCita,
+                      onPressed:
+                          () => Functions.guardarCita(
+                            context: context,
+                            dateController: _dateController,
+                            timeController: _timeController,
+                            doctorController: _doctorController,
+                            addressController: _addressController,
+                          ),
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 15),
                         backgroundColor: Color.fromRGBO(35, 150, 230, 1),
@@ -127,34 +103,6 @@ class _AgregarCitaState extends State<AgregarCita> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildTextField(
-    TextEditingController controller,
-    String label,
-    IconData icon, [
-    VoidCallback? onTap,
-    bool readOnly = false,
-  ]) {
-    return TextFormField(
-      controller: controller,
-      readOnly: readOnly,
-      cursorColor: Colors.black,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        prefixIcon: Icon(icon),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.black),
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Color.fromRGBO(35, 150, 230, 1)),
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-      ),
-      onTap: onTap,
     );
   }
 }

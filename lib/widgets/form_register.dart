@@ -68,11 +68,11 @@ class _FormRegisterState extends State<FormRegister> {
           _buildNameField(),
           SizedBox(height: 20),
           _buildEmailField(),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           _buildPasswordField(),
-          const SizedBox(height: 30),
+          SizedBox(height: 30),
           _registerButton(),
-          const SizedBox(height: 15),
+          SizedBox(height: 15),
           _loginButton(),
         ],
       ),
@@ -87,7 +87,7 @@ class _FormRegisterState extends State<FormRegister> {
       textCapitalization: TextCapitalization.words,
       decoration: InputDecoration(
         labelText: 'Nombre',
-        labelStyle: const TextStyle(
+        labelStyle: TextStyle(
           color: Colors.black,
           fontWeight: FontWeight.bold,
         ),
@@ -95,15 +95,15 @@ class _FormRegisterState extends State<FormRegister> {
           Icons.supervised_user_circle,
           color:
               _nameIsFocus
-                  ? const Color.fromRGBO(35, 150, 230, 1)
+                  ? Color.fromRGBO(35, 150, 230, 1)
                   : Colors.black,
         ),
         enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.black),
+          borderSide: BorderSide(color: Colors.black),
           borderRadius: BorderRadius.circular(8.0),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Color.fromRGBO(35, 150, 230, 1)),
+          borderSide: BorderSide(color: Color.fromRGBO(35, 150, 230, 1)),
           borderRadius: BorderRadius.circular(8.0),
         ),
       ),
@@ -117,7 +117,7 @@ class _FormRegisterState extends State<FormRegister> {
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         labelText: 'Correo Electrónico',
-        labelStyle: const TextStyle(
+        labelStyle: TextStyle(
           color: Colors.black,
           fontWeight: FontWeight.bold,
         ),
@@ -155,7 +155,7 @@ class _FormRegisterState extends State<FormRegister> {
           Icons.lock_outline,
           color:
               _passwordIsFocus
-                  ? const Color.fromRGBO(35, 150, 230, 1)
+                  ? Color.fromRGBO(35, 150, 230, 1)
                   : Colors.black,
         ),
         suffixIcon: IconButton(
@@ -165,11 +165,11 @@ class _FormRegisterState extends State<FormRegister> {
           onPressed: () => setState(() => _ocultarPassword = !_ocultarPassword),
         ),
         enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.black),
+          borderSide: BorderSide(color: Colors.black),
           borderRadius: BorderRadius.circular(8.0),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Color.fromRGBO(35, 150, 230, 1)),
+          borderSide: BorderSide(color: Color.fromRGBO(35, 150, 230, 1)),
           borderRadius: BorderRadius.circular(8.0),
         ),
       ),

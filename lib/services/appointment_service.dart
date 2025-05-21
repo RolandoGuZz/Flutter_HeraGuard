@@ -9,11 +9,12 @@ class AppointmentService {
     final currentUser = _auth.currentUser;
     if (currentUser == null) return [];
 
-    final snapshot = await _firestore
-        .collection('users')
-        .doc(currentUser.uid)
-        .collection('appointments')
-        .get();
+    final snapshot =
+        await _firestore
+            .collection('users')
+            .doc(currentUser.uid)
+            .collection('appointments')
+            .get();
 
     return snapshot.docs.map((doc) => doc.data()).toList();
   }
@@ -32,11 +33,37 @@ class AppointmentService {
         .doc(currentUser.uid)
         .collection('appointments')
         .add({
-      'date': date,
-      'time': time,
-      'doctor': doctor,
-      'address': address,
-      'createdAt': FieldValue.serverTimestamp(), // Campo adicional útil
-    });
+          'date': date,
+          'time': time,
+          'doctor': doctor,
+          'address': address,
+        });
+  }
+
+  static Future<void> addTreatment({
+    required String type,
+    required String name,
+    required String dose,
+    required String frequency,
+    String? specificTime,
+    required String duration,
+    required String routeOfAdministration,
+  }) async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) throw Exception('Usuario no autenticado');
+
+    await _firestore
+        .collection('users')
+        .doc(currentUser.uid)
+        .collection('treatment')
+        .add({
+          'type': type,
+          'name': name,
+          'dose': dose,
+          'frequency': frequency,
+          'specificTime': specificTime,
+          'duration': duration,
+          'routeOfAdministration': routeOfAdministration,
+        });
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:heraguard/functions/functions.dart';
 import 'package:heraguard/widgets/appbar_widget.dart';
 import 'package:heraguard/widgets/custom_text_field.dart';
 
@@ -10,7 +11,6 @@ class AgregarMedicamento extends StatefulWidget {
 }
 
 class _AgregarMedicamentoState extends State<AgregarMedicamento> {
-  final _typeController = TextEditingController();
   final _nameController = TextEditingController();
   final _doseController = TextEditingController();
   final _frequencyController = TextEditingController();
@@ -21,8 +21,24 @@ class _AgregarMedicamentoState extends State<AgregarMedicamento> {
 
   final _formKey = GlobalKey<FormState>();
 
+  String? dropDownValue;
+
+  void funDrop(String? value) {
+    setState(() {
+      dropDownValue = value;
+    });
+  }
+
+  final List<String> _tiposTratamiento = [
+    'Tomado (Oral)',
+    'Inyectado',
+    'Tópico',
+  ];
+
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
       appBar: AppbarWidget(),
       body: Center(
@@ -39,12 +55,44 @@ class _AgregarMedicamentoState extends State<AgregarMedicamento> {
                     style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 20),
-                  CustomTextField(
-                    controller: _typeController,
-                    label: 'Tipo',
-                    icon: Icons.category,
-                    onTap: () {},
-                    readOnly: true,
+                  Container(
+                    width: size.width * 0.92,
+                    height: 55,
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.blue),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      icon: Icon(Icons.arrow_drop_down, color: Colors.white),
+                      iconSize: 30,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      dropdownColor: Colors.blue,
+                      borderRadius: BorderRadius.circular(10),
+                      hint: Text(
+                        'Seleccione el tipo de tratamiento',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      items:
+                          _tiposTratamiento.map((value) {
+                            return DropdownMenuItem(
+                              value: value,
+                              child: Text(
+                                value,
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            );
+                          }).toList(),
+                      value: dropDownValue,
+                      onChanged: funDrop,
+                      underline: Container(),
+                    ),
                   ),
                   SizedBox(height: 20),
                   CustomTextField(
@@ -63,7 +111,11 @@ class _AgregarMedicamentoState extends State<AgregarMedicamento> {
                     controller: _frequencyController,
                     label: 'Frecuencia',
                     icon: Icons.repeat,
-                    onTap: () {},
+                    onTap:
+                        () => Functions.showTime(
+                          context: context,
+                          controller: _frequencyController,
+                        ),
                     readOnly: true,
                   ),
                   SizedBox(height: 20),
@@ -71,7 +123,11 @@ class _AgregarMedicamentoState extends State<AgregarMedicamento> {
                     controller: _specificTimeController,
                     label: 'Hora Especifica (Opcional)',
                     icon: Icons.access_time,
-                    onTap: () {},
+                    onTap:
+                        () => Functions.showTime(
+                          context: context,
+                          controller: _specificTimeController,
+                        ),
                     readOnly: true,
                   ),
                   SizedBox(height: 20),
@@ -79,20 +135,34 @@ class _AgregarMedicamentoState extends State<AgregarMedicamento> {
                     controller: _durationController,
                     label: 'Duracion',
                     icon: Icons.calendar_today,
+                    onTap:
+                        () => Functions.showCalendar(
+                          context: context,
+                          controller: _durationController,
+                        ),
+                    readOnly: true,
                   ),
                   SizedBox(height: 20),
                   CustomTextField(
                     controller: _routeOfAdminController,
                     label: 'Via de Administracion',
                     icon: Icons.alt_route,
-                    onTap: () {},
-                    readOnly: true,
                   ),
                   SizedBox(height: 30),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed:
+                          () => Functions.guardarTratamiento(
+                            context: context,
+                            dropOption: dropDownValue,
+                            nameController: _nameController,
+                            doseController: _doseController,
+                            frequencyController: _frequencyController,
+                            specificTimeController: _specificTimeController,
+                            durationController: _durationController,
+                            routeController: _routeOfAdminController,
+                          ),
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 15),
                         backgroundColor: Color.fromRGBO(35, 150, 230, 1),

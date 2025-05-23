@@ -6,7 +6,10 @@ class AppbarWidget extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text('HeraGuard', style: TextStyle(color: Colors.white)),
+      title: Text(
+        'HeraGuard',
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
       centerTitle: true,
       backgroundColor: Color.fromRGBO(35, 150, 230, 1),
       iconTheme: IconThemeData(color: Colors.white),

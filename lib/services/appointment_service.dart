@@ -41,11 +41,11 @@ class AppointmentService {
   }
 
   static Future<void> addTreatment({
-    required String type,
+    required String? type,
     required String name,
     required String dose,
     required String frequency,
-    String? specificTime,
+    required String? specificTime,
     required String duration,
     required String routeOfAdministration,
   }) async {

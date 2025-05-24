@@ -8,6 +8,7 @@ class CustomTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final VoidCallback? onTap;
   final TextCapitalization textCap;
+  final bool obscureText;
 
   const CustomTextField({
     super.key,
@@ -18,6 +19,7 @@ class CustomTextField extends StatelessWidget {
     this.onTap,
     this.keyboardType,
     this.textCap = TextCapitalization.none,
+    this.obscureText = false,
   });
 
   @override
@@ -27,6 +29,7 @@ class CustomTextField extends StatelessWidget {
       readOnly: readOnly,
       keyboardType: keyboardType,
       textCapitalization: textCap,
+      obscureText: obscureText,
       cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: label,

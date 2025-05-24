@@ -77,6 +77,17 @@ class _AgregarMedicamentoState extends State<AgregarMedicamento> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(_updateState);
+    _doseController.addListener(_updateState);
+    _durationNumberController.addListener(_updateState);
+    _startDateController.addListener(_updateState);
+  }
+
+  void _updateState() => setState(() {});
+
+  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
@@ -192,10 +203,7 @@ class _AgregarMedicamentoState extends State<AgregarMedicamento> {
                               : null,
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 15),
-                        backgroundColor:
-                            _formValid()
-                                ? Color.fromRGBO(35, 150, 230, 1)
-                                : Colors.grey,
+                        backgroundColor: Color.fromRGBO(35, 150, 230, 1),
                       ),
                       child: Text(
                         'Guardar Medicamento',

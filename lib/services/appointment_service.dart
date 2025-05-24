@@ -22,12 +22,12 @@ class AppointmentService {
   static Future<void> addAppointment({
     required String date,
     required String time,
-    required String doctor,
+    required String? doctor,
     required String address,
   }) async {
     final currentUser = _auth.currentUser;
     if (currentUser == null) throw Exception('Usuario no autenticado');
-
+    
     await _firestore
         .collection('users')
         .doc(currentUser.uid)

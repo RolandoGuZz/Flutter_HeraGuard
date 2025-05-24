@@ -18,6 +18,22 @@ class _AgregarCitaState extends State<AgregarCita> {
 
   final _formKey = GlobalKey<FormState>();
 
+  bool _formCitaValido() {
+    return _dateController.text.isNotEmpty &&
+        _timeController.text.isNotEmpty &&
+        _addressController.text.isNotEmpty;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _dateController.addListener(_updateState);
+    _timeController.addListener(_updateState);
+    _addressController.addListener(_updateState);
+  }
+
+  void _updateState() => setState(() {});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,13 +94,15 @@ class _AgregarCitaState extends State<AgregarCita> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed:
-                          () => Functions.guardarCita(
-                            context: context,
-                            dateController: _dateController,
-                            timeController: _timeController,
-                            doctorController: _doctorController,
-                            addressController: _addressController,
-                          ),
+                          _formCitaValido()
+                              ? () => Functions.guardarCita(
+                                context: context,
+                                dateController: _dateController,
+                                timeController: _timeController,
+                                doctorController: _doctorController,
+                                addressController: _addressController,
+                              )
+                              : null,
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 15),
                         backgroundColor: Color.fromRGBO(35, 150, 230, 1),

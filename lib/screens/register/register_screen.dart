@@ -1,8 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:heraguard/screens/login/login_screen.dart';
 import 'package:heraguard/screens/screens.dart';
-import 'package:heraguard/widgets/form_register.dart';
+import 'package:heraguard/widgets/custom_text_field.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -12,14 +15,15 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
 
+  //final _formKey = GlobalKey<FormState>();
+
   Future<void> _register() async {
-    if (!_formKey.currentState!.validate()) return;
+    //if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
     try {
       final userCredential = await FirebaseAuth.instance
@@ -30,12 +34,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userCredential.user!.uid)
-          .set({
-            'name':
-                _nameController.text.trim(),
-          });
+          .set({'name': _nameController.text.trim()});
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Bienvenido ${userCredential.user!.email}',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          backgroundColor: Color.fromRGBO(35, 150, 230, 1),
+        ),
+      );
       Navigator.pushReplacement(
-        // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
       );
@@ -48,7 +61,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       } else if (error.code == 'invalid-email') {
         errorMessage = 'Correo inválido';
       }
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
       );
@@ -66,6 +78,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _passwordController.dispose();
     super.dispose();
   }
+
+  void _navigateToLogin() {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => LoginScreen()));
+  }
+
+  bool _formRegisterValido() {
+    return _nameController.text.isNotEmpty &&
+        _emailController.text.isNotEmpty &&
+        _passwordController.text.isNotEmpty;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(_updateState);
+    _emailController.addListener(_updateState);
+    _passwordController.addListener(_updateState);
+  }
+
+  void _updateState() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
@@ -100,14 +132,66 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 SizedBox(height: 30),
-                FormRegister(
-                  formKey: _formKey,
-                  nameComtroller: _nameController,
-                  emailController: _emailController,
-                  passwordController: _passwordController,
-                  onSubmit: _register,
-                  onLoginPressed: () => Navigator.pop(context),
-                  isLoading: _isLoading,
+                CustomTextField(
+                  controller: _nameController,
+                  label: 'Nombre',
+                  icon: Icons.person,
+                  textCap: TextCapitalization.words,
+                ),
+                SizedBox(height: 20),
+                CustomTextField(
+                  controller: _emailController,
+                  label: 'Correo',
+                  icon: Icons.email_outlined,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                SizedBox(height: 20),
+                CustomTextField(
+                  controller: _passwordController,
+                  label: 'Contraseña',
+                  icon: Icons.lock_outline,
+                  keyboardType: TextInputType.visiblePassword,
+                  obscureText: true,
+                ),
+                SizedBox(height: 30),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed:
+                        _isLoading
+                            ? null
+                            : _formRegisterValido()
+                            ? _register
+                            : null,
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      minimumSize: Size(double.infinity, 0),
+                      backgroundColor: Color.fromRGBO(35, 150, 230, 1),
+                    ),
+                    child:
+                        _isLoading
+                            ? CircularProgressIndicator(color: Colors.white)
+                            : Text(
+                              'Crear Cuenta',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                TextButton(
+                  onPressed: _navigateToLogin,
+                  child: Text(
+                    '¿Ya tienes cuenta? Inicia Sesión',
+                    style: TextStyle(
+                      color: Color.fromRGBO(35, 150, 230, 1),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
                 ),
               ],
             ),

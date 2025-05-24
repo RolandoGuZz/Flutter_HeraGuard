@@ -16,7 +16,7 @@ class MedicamentosScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              'Tratamientos Médicos',
+              'Medicamentos',
               style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),

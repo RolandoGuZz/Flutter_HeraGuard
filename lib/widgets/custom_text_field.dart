@@ -5,7 +5,9 @@ class CustomTextField extends StatelessWidget {
   final bool readOnly;
   final String label;
   final IconData icon;
+  final TextInputType? keyboardType;
   final VoidCallback? onTap;
+  final TextCapitalization textCap;
 
   const CustomTextField({
     super.key,
@@ -14,6 +16,8 @@ class CustomTextField extends StatelessWidget {
     required this.label,
     required this.icon,
     this.onTap,
+    this.keyboardType,
+    this.textCap = TextCapitalization.none,
   });
 
   @override
@@ -21,13 +25,12 @@ class CustomTextField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       readOnly: readOnly,
+      keyboardType: keyboardType,
+      textCapitalization: textCap,
       cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(
-          color: Colors.black,
-          fontWeight: FontWeight.bold,
-        ),
+        labelStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         prefixIcon: Icon(icon),
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.black),

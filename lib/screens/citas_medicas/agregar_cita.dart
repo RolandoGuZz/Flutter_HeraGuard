@@ -62,14 +62,16 @@ class _AgregarCitaState extends State<AgregarCita> {
                   SizedBox(height: 20),
                   CustomTextField(
                     controller: _doctorController,
-                    label: 'Doctor',
+                    label: 'Nombre Doctor (Opcional)',
                     icon: Icons.person,
+                    textCap: TextCapitalization.words,
                   ),
                   SizedBox(height: 20),
                   CustomTextField(
                     controller: _addressController,
                     label: 'Dirección',
                     icon: Icons.place,
+                    textCap: TextCapitalization.words,
                   ),
                   SizedBox(height: 30),
                   SizedBox(

@@ -39,31 +39,4 @@ class AppointmentService {
           'address': address,
         });
   }
-
-  static Future<void> addTreatment({
-    required String? type,
-    required String name,
-    required String dose,
-    required String frequency,
-    required String? specificTime,
-    required String duration,
-    required String routeOfAdministration,
-  }) async {
-    final currentUser = _auth.currentUser;
-    if (currentUser == null) throw Exception('Usuario no autenticado');
-
-    await _firestore
-        .collection('users')
-        .doc(currentUser.uid)
-        .collection('treatment')
-        .add({
-          'type': type,
-          'name': name,
-          'dose': dose,
-          'frequency': frequency,
-          'specificTime': specificTime,
-          'duration': duration,
-          'routeOfAdministration': routeOfAdministration,
-        });
-  }
 }

@@ -5,6 +5,20 @@ class MedicineService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  static Future<List<Map<String, dynamic>>> getMedications() async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) return [];
+
+    final snapshot =
+        await _firestore
+            .collection('users')
+            .doc(currentUser.uid)
+            .collection('medications')
+            .get();
+
+    return snapshot.docs.map((doc) => doc.data()).toList();
+  }
+
   static Future<void> addMedicine({
     required String? type,
     required String name,

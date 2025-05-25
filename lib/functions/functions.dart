@@ -89,6 +89,77 @@ class Functions {
         backgroundColor: Color.fromRGBO(35, 150, 230, 1),
       ),
     );
-    Navigator.pop(context);
+    Navigator.pop(context, true);
+  }
+
+  static Future<void> eliminarCita({
+    required BuildContext context,
+    required String idAppointment,
+  }) async {
+    try {
+      bool confirm = await showDialog(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              title: Text('¿Eliminar cita?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text(
+                    'Cancelar',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: Text(
+                    'Eliminar',
+                    style: TextStyle(
+                      color: Color.fromRGBO(35, 150, 230, 1),
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+      );
+      if (confirm == true) {
+        await AppointmentService.deleteAppointment(
+          idAppointment: idAppointment,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Cita eliminada con éxito',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            backgroundColor: Color.fromRGBO(35, 150, 230, 1),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Error al eliminar la cita',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }

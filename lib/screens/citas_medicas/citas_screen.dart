@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:heraguard/functions/functions.dart';
 import 'package:heraguard/screens/screens.dart';
 import 'package:heraguard/services/appointment_service.dart';
 import 'package:heraguard/widgets/sidebar.dart';
@@ -12,17 +13,18 @@ class CitasScreen extends StatefulWidget {
 }
 
 class _CitasScreenState extends State<CitasScreen> {
-  late Future<List> _appointmentsFuture;
-  @override
-  void initState() {
-    super.initState();
-    _appointmentsFuture = AppointmentService.getAppointments();
-  }
+  late Future<List<Map<String, dynamic>>> _appointmentsFuture;
 
-  void _recargarCitas() {
+  Future<void> _loadAppointments() async {
     setState(() {
       _appointmentsFuture = AppointmentService.getAppointments();
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAppointments();
   }
 
   @override
@@ -37,53 +39,100 @@ class _CitasScreenState extends State<CitasScreen> {
             SizedBox(height: 20),
             Text(
               'Citas Médicas',
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
             Expanded(
-              child: FutureBuilder(
+              child: FutureBuilder<List<Map<String, dynamic>>>(
                 future: _appointmentsFuture,
                 builder: ((context, snapshot) {
-                  if (snapshot.hasData) {
-                    final appointments = snapshot.data!;
-                    return ListView.builder(
-                      itemCount: appointments.length,
-                      itemBuilder: (context, index) {
-                        final appointment = appointments[index];
-                        return Card(
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 10,
-                          ),
-                          child: ListTile(
-                            title: Text(
-                              'Doctor: ${appointment['doctor']}',
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Fecha: ${appointment['date']}',
-                                ),
-                                Text(
-                                  'Hora: ${appointment['time']}',
-                                ),
-                                Text(
-                                  'Dirección: ${appointment['address']}',
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  } else {
-                    return Center(
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
                       child: CircularProgressIndicator(
                         color: Color.fromRGBO(35, 150, 230, 1),
                       ),
                     );
                   }
+
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(
+                      child: Text("No hay citas registradas"),
+                    );
+                  }
+                  final appointments = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: appointments.length,
+                    itemBuilder: (context, index) {
+                      final appointment = appointments[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 15,
+                          vertical: 6,
+                        ),
+                        color: Color.fromRGBO(35, 150, 230, 1),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Fecha: ${appointment['date']}',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(Icons.edit),
+                                        color: Colors.amber,
+                                        iconSize: 35,
+                                      ),
+                                      IconButton(
+                                        onPressed: () async {
+                                          await Functions.eliminarCita(
+                                            context: context,
+                                            idAppointment: appointment['id'],
+                                          );
+                                          _loadAppointments();
+                                        },
+                                        icon: Icon(Icons.delete),
+                                        color: Colors.red,
+                                        iconSize: 35,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                'Hora: ${appointment['time']}',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                'Dirección: ${appointment['address']}',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
                 }),
               ),
             ),
@@ -100,7 +149,7 @@ class _CitasScreenState extends State<CitasScreen> {
                 MaterialPageRoute(builder: (context) => AgregarCita()),
               );
               if (result == true) {
-                _recargarCitas();
+                _loadAppointments();
               }
             },
             backgroundColor: Colors.green,

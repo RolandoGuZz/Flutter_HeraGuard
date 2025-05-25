@@ -16,7 +16,11 @@ class AppointmentService {
             .collection('appointments')
             .get();
 
-    return snapshot.docs.map((doc) => doc.data()).toList();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return data;
+    }).toList();
   }
 
   static Future<void> addAppointment({
@@ -27,7 +31,7 @@ class AppointmentService {
   }) async {
     final currentUser = _auth.currentUser;
     if (currentUser == null) throw Exception('Usuario no autenticado');
-    
+
     await _firestore
         .collection('users')
         .doc(currentUser.uid)
@@ -38,5 +42,17 @@ class AppointmentService {
           'doctor': doctor,
           'address': address,
         });
+  }
+
+  static Future<void> deleteAppointment({required String idAppointment}) async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) throw Exception('Usuario no autenticado');
+
+    await _firestore
+        .collection('users')
+        .doc(currentUser.uid)
+        .collection('appointments')
+        .doc(idAppointment)
+        .delete();
   }
 }

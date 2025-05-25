@@ -98,6 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         backgroundColor: Color.fromRGBO(35, 150, 230, 1),
         centerTitle: true,
+        automaticallyImplyLeading: false,
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -145,7 +146,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _formLoginValido() ? _submitForm : null,
+                    onPressed:
+                        _isLoading
+                            ? null
+                            : _formLoginValido()
+                            ? _submitForm
+                            : null,
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 15),
                       minimumSize: Size(double.infinity, 0),

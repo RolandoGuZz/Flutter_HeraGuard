@@ -110,6 +110,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Color.fromRGBO(35, 150, 230, 1),
         centerTitle: true,
+        automaticallyImplyLeading: true,
       ),
       body: Center(
         child: SingleChildScrollView(

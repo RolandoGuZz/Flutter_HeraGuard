@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:heraguard/functions/functions.dart';
+import 'package:heraguard/screens/citas_medicas/actualizar_cita.dart';
 import 'package:heraguard/screens/screens.dart';
 import 'package:heraguard/services/appointment_service.dart';
 import 'package:heraguard/widgets/sidebar.dart';
@@ -53,7 +54,6 @@ class _CitasScreenState extends State<CitasScreen> {
                       ),
                     );
                   }
-
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return const Center(
                       child: Text("No hay citas registradas"),
@@ -90,8 +90,26 @@ class _CitasScreenState extends State<CitasScreen> {
                                   Row(
                                     children: [
                                       IconButton(
-                                        onPressed: () {},
-                                        icon: Icon(Icons.edit),
+                                        onPressed: () async {
+                                          final actualizado =
+                                              await Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder:
+                                                      (
+                                                        context,
+                                                      ) => ActualizarCita(
+                                                        idAppointment:
+                                                            appointment['id'],
+                                                      ),
+                                                ),
+                                              );
+
+                                          if (actualizado == true) {
+                                            _loadAppointments();
+                                          }
+                                        },
+                                        icon: const Icon(Icons.edit),
                                         color: Colors.amber,
                                         iconSize: 35,
                                       ),

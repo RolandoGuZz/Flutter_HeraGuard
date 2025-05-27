@@ -16,11 +16,15 @@ class MedicineService {
             .collection('medications')
             .get();
 
-    return snapshot.docs.map((doc) => doc.data()).toList();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return data;
+    }).toList();
   }
 
   static Future<void> addMedicine({
-    required String? type,
+    required String? route,
     required String name,
     required String dose,
     required String? frequency,
@@ -37,7 +41,7 @@ class MedicineService {
         .doc(currentUser.uid)
         .collection('medications')
         .add({
-          'type': type,
+          'route': route,
           'name': name,
           'dose': dose,
           'frequency': frequency,
@@ -46,5 +50,52 @@ class MedicineService {
           'durationNumber': durationNumber,
           'startDate': startDate,
         });
+  }
+
+  static Future<Map<String, dynamic>> getMedicine({
+    required String idMedicine,
+  }) async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) throw Exception("Usuario no autenticado");
+
+    final appointment =
+        await _firestore
+            .collection('users')
+            .doc(currentUser.uid)
+            .collection('medications')
+            .doc(idMedicine)
+            .get();
+
+    if (!appointment.exists) {
+      throw Exception("Medicamento no encontrado");
+    }
+    return appointment.data() as Map<String, dynamic>;
+  }
+
+  static Future<void> deleteMedicine({required String idMedicine}) async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) throw Exception('Usuario no autenticado');
+
+    await _firestore
+        .collection('users')
+        .doc(currentUser.uid)
+        .collection('medications')
+        .doc(idMedicine)
+        .delete();
+  }
+
+  static Future<void> updateMedicine({
+    required String idMedicine,
+    required Map<String, dynamic> data,
+  }) async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) throw Exception('Usuario no autenticado');
+
+    await _firestore
+        .collection('users')
+        .doc(currentUser.uid)
+        .collection('medications')
+        .doc(idMedicine)
+        .update(data);
   }
 }

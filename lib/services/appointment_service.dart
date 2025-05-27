@@ -23,6 +23,26 @@ class AppointmentService {
     }).toList();
   }
 
+  static Future<Map<String, dynamic>> getAppointment({
+    required String idAppointment,
+  }) async {
+    final currentUser = _auth.currentUser;
+    if(currentUser == null) throw Exception("Usuario no autenticado");
+
+    final appointment =
+        await _firestore
+            .collection('users')
+            .doc(currentUser.uid)
+            .collection('appointments')
+            .doc(idAppointment)
+            .get();
+
+    if(!appointment.exists){
+      throw Exception("Cita no encontrada");
+    }
+    return appointment.data() as Map<String, dynamic>;
+  }
+
   static Future<void> addAppointment({
     required String date,
     required String time,
@@ -54,5 +74,17 @@ class AppointmentService {
         .collection('appointments')
         .doc(idAppointment)
         .delete();
+  }
+
+  static Future<void> updateAppointment({required String idAppointment, required Map<String, dynamic> data}) async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) throw Exception('Usuario no autenticado');
+
+    await _firestore
+        .collection('users')
+        .doc(currentUser.uid)
+        .collection('appointments')
+        .doc(idAppointment)
+        .update(data);
   }
 }

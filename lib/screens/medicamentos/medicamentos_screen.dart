@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:heraguard/functions/functions.dart';
+import 'package:heraguard/screens/medicamentos/actualizar_medicamento.dart';
 import 'package:heraguard/services/medicine_service.dart';
 import 'package:heraguard/widgets/appbar_widget.dart';
 import 'package:heraguard/widgets/sidebar.dart';
@@ -12,7 +14,7 @@ class MedicamentosScreen extends StatefulWidget {
 }
 
 class _MedicamentosScreenState extends State<MedicamentosScreen> {
-  late Future<List> _medicationsFuture;
+  late Future<List<Map<String, dynamic>>> _medicationsFuture;
 
   Future<void> _loadMedications() async {
     setState(() {
@@ -41,95 +43,123 @@ class _MedicamentosScreenState extends State<MedicamentosScreen> {
             ),
             SizedBox(height: 10),
             Expanded(
-              child: FutureBuilder(
+              child: FutureBuilder<List<Map<String, dynamic>>>(
                 future: _medicationsFuture,
                 builder: ((context, snapshot) {
-                  if (snapshot.hasData) {
-                    final medications = snapshot.data!;
-                    return ListView.builder(
-                      itemCount: medications.length,
-                      itemBuilder: (context, index) {
-                        final medicine = medications[index];
-                        return Card(
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 10,
-                          ),
-                          color: Color.fromRGBO(35, 150, 230, 1),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Nombre: ${medicine['name']}',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 28,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        IconButton(
-                                          onPressed: () {},
-                                          icon: Icon(Icons.edit),
-                                          color: Colors.amber,
-                                          iconSize: 35,
-                                        ),
-                                        IconButton(
-                                          onPressed: () {},
-                                          icon: Icon(Icons.delete),
-                                          color: Colors.red,
-                                          iconSize: 35,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                Text(
-                                  'Dosis: ${medicine['dose']}',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 5),
-                                Text(
-                                  'Duración: ${medicine['durationNumber']} ${medicine['duration']}',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 5),
-                                Text(
-                                  'Frecuencia: ${medicine['frequency']}',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  } else {
-                    return Center(
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
                       child: CircularProgressIndicator(
                         color: Color.fromRGBO(35, 150, 230, 1),
                       ),
                     );
                   }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(
+                      child: Text("No hay medicamentos registrados"),
+                    );
+                  }
+                  final medications = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: medications.length,
+                    itemBuilder: (context, index) {
+                      final medicine = medications[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
+                        color: Color.fromRGBO(35, 150, 230, 1),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Nombre: ${medicine['name']}',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        onPressed: () async {
+                                          final actualizado =
+                                              await Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder:
+                                                      (
+                                                        context,
+                                                      ) => ActualizarMedicamento(
+                                                        idMedicine:
+                                                            medicine['id'],
+                                                      ),
+                                                ),
+                                              );
+
+                                          if (actualizado == true) {
+                                            _loadMedications();
+                                          }
+                                        },
+                                        icon: Icon(Icons.edit),
+                                        color: Colors.amber,
+                                        iconSize: 35,
+                                      ),
+                                      IconButton(
+                                        onPressed: () async {
+                                          await Functions.eliminarMedicamento(
+                                            context: context,
+                                            idMedicine: medicine['id'],
+                                          );
+                                          _loadMedications();
+                                        },
+                                        icon: Icon(Icons.delete),
+                                        color: Colors.red,
+                                        iconSize: 35,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                'Dosis: ${medicine['dose']}',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 5),
+                              Text(
+                                'Duración: ${medicine['durationNumber']} ${medicine['duration']}',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 5),
+                              Text(
+                                'Frecuencia: ${medicine['frequency']}',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
                 }),
               ),
             ),

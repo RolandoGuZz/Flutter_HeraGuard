@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:heraguard/functions/functions.dart';
 
 class AppointmentService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final FirebaseAuth _auth = FirebaseAuth.instance;
+  static int _contNoti = 0;
 
   static Future<List<Map<String, dynamic>>> getAppointments() async {
     final currentUser = _auth.currentUser;
@@ -27,7 +29,7 @@ class AppointmentService {
     required String idAppointment,
   }) async {
     final currentUser = _auth.currentUser;
-    if(currentUser == null) throw Exception("Usuario no autenticado");
+    if (currentUser == null) throw Exception("Usuario no autenticado");
 
     final appointment =
         await _firestore
@@ -37,7 +39,7 @@ class AppointmentService {
             .doc(idAppointment)
             .get();
 
-    if(!appointment.exists){
+    if (!appointment.exists) {
       throw Exception("Cita no encontrada");
     }
     return appointment.data() as Map<String, dynamic>;
@@ -51,17 +53,20 @@ class AppointmentService {
   }) async {
     final currentUser = _auth.currentUser;
     if (currentUser == null) throw Exception('Usuario no autenticado');
-
+    int idNoti = _contNoti++;
     await _firestore
         .collection('users')
         .doc(currentUser.uid)
         .collection('appointments')
         .add({
+          'idNoti': idNoti,
           'date': date,
           'time': time,
           'doctor': doctor,
           'address': address,
         });
+
+    await Functions.programarNotificacionesDeCitas();
   }
 
   static Future<void> deleteAppointment({required String idAppointment}) async {
@@ -76,7 +81,10 @@ class AppointmentService {
         .delete();
   }
 
-  static Future<void> updateAppointment({required String idAppointment, required Map<String, dynamic> data}) async {
+  static Future<void> updateAppointment({
+    required String idAppointment,
+    required Map<String, dynamic> data,
+  }) async {
     final currentUser = _auth.currentUser;
     if (currentUser == null) throw Exception('Usuario no autenticado');
 

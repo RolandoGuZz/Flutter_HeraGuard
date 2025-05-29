@@ -1,11 +1,16 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:heraguard/services/appointment_service.dart';
 import 'package:heraguard/services/medicine_service.dart';
+import 'package:heraguard/services/notification_service.dart';
 import 'package:intl/intl.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class Functions {
+  static int _idNoti = 0;
+
   static Future<void> showCalendar({
     required BuildContext context,
     required TextEditingController controller,
@@ -96,6 +101,8 @@ class Functions {
             ),
       );
       if (confirm == true) {
+        print('Eliminando noti ID $_idNoti');
+        await FlutterLocalNotificationsPlugin().cancel(_idNoti);
         await AppointmentService.deleteAppointment(
           idAppointment: idAppointment,
         );
@@ -298,5 +305,80 @@ class Functions {
       ),
     );
     Navigator.pop(context, true);
+  }
+
+  // static Future<void> programarNotificacionesDeCitas() async {
+  //   final citas = await AppointmentService.getAppointments();
+  //   //await NotificationService.requestPermissions();
+  //   for (var cita in citas) {
+  //     final String fechaStr = cita['date'];
+  //     final String horaStr = cita['time'];
+  //     final String doctor =
+  //         (cita['doctor'] ?? '').isEmpty ? 'Médico' : cita['doctor'];
+  //     final String direccion = cita['address'] ?? 'Dirección desconocida';
+  //     _idNoti = cita['idNoti'];
+  //     try {
+  //       final DateFormat formato = DateFormat('dd/MM/yyyy h:mm a');
+  //       final DateTime fechaHora = formato.parse('$fechaStr $horaStr');
+  //       print('Programando noti ID $_idNoti para $fechaHora');
+  //       try {
+  //         await NotificationService.scheduleNotificationExact(
+  //           id: _idNoti,
+  //           title: 'Tienes cita médica con $doctor',
+  //           body: 'Lugar: $direccion, Hora $horaStr',
+  //           dateTime: fechaHora,
+  //         );
+  //       } catch (e) {
+  //         print('Error al crear la noti');
+  //       }
+  //       print('Nofi enviada');
+  //     } catch (e) {
+  //       //throw Exception('Error al programar notificación: $e');
+  //       print('Error al programar notificación: $e');
+  //     }
+  //   }
+  // }
+
+  static Future<void> programarNotificacionesDeCitas() async {
+    final citas = await AppointmentService.getAppointments();
+
+    for (var cita in citas) {
+      final String fechaStr = cita['date'];
+      final String horaStr = cita['time'];
+      final String doctor =
+          (cita['doctor'] ?? '').isEmpty ? 'Médico' : cita['doctor'];
+      final String direccion = cita['address'] ?? 'Dirección desconocida';
+      _idNoti = cita['idNoti'];
+
+      try {
+        final DateFormat formato = DateFormat('dd/MM/yyyy h:mm a');
+        final DateTime fechaHora = formato.parse('$fechaStr $horaStr');
+        final tz.TZDateTime fechaHoraTZ = tz.TZDateTime.from(
+          fechaHora,
+          tz.local,
+        );
+        final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+
+        print('Programando noti ID $_idNoti para $fechaHoraTZ (ahora: $now)');
+
+        if (!fechaHoraTZ.isAfter(now)) {
+          print(
+            '❌ No se programó la notificación ID $_idNoti porque la fecha ya pasó',
+          );
+          continue;
+        }
+
+        await NotificationService.scheduleNotificationExact(
+          id: _idNoti,
+          title: 'Tienes cita médica con $doctor',
+          body: 'Lugar: $direccion, Hora $horaStr',
+          dateTime: fechaHora,
+        );
+
+        print('✅ Notificación ID $_idNoti programada correctamente');
+      } catch (e) {
+        print('❌ Error al programar notificación ID $_idNoti: $e');
+      }
+    }
   }
 }

@@ -3,10 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:heraguard/firebase_options.dart';
 import 'package:heraguard/routes/my_routes.dart';
 import 'package:heraguard/screens/splash_screen.dart';
+import 'package:heraguard/services/notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  await NotificationService.initialize();
+  await NotificationService.requestPermissions();
+  //await Functions.programarNotificacionesDeCitas();
+
   runApp(const MyApp());
 }
 

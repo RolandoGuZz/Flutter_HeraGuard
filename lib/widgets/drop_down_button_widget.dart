@@ -1,5 +1,21 @@
 import 'package:flutter/material.dart';
 
+/// Clase que crea un DropDownButton personalizado
+/// Características:
+/// - Ancho adaptable (92% del tamaño)
+/// - Altura fija de 55px
+/// - Estilo azul con texto blanco
+/// - Flecha desplegable blanca
+/// - Borde redondeado (10px)
+/// - Elimina la línea inferior por defecto
+/// 
+/// Requiere:
+/// - [size]: Tamaño del contenedor (generalmente ancho del padre)
+/// - [listOfOptions]: Lista no vacía de strings
+/// - [valueInitial]: Valor actual seleccionado
+/// - [funSelectOption]: Función que se encarga de actualizar la opción seleccionada
+/// - [hintText]: Widget Text con estilo personalizado
+
 class DropDownButtonWidget extends StatelessWidget {
   final Size size;
   final List<String> listOfOptions;

@@ -6,6 +6,32 @@ import 'package:heraguard/services/appointment_service.dart';
 import 'package:heraguard/widgets/sidebar.dart';
 import 'package:heraguard/widgets/appbar_widget.dart';
 
+/// Pantalla principal para visualizar y administrar las citas médicas registradas.
+/// Muestra una lista interactiva de citas con capacidad para agregar, editar y eliminar registros.
+/// Se integra con el AppointmentService para obtener datos y actualizar la interfaz de manera reactiva.
+/// Características Principales
+/// - Muestra lista completa de citas médicas registradas
+/// - Permite agregar nuevas citas
+/// - Ofrece funcionalidad de edición y eliminación por cada ítem
+/// - Actualización automática de la lista tras modificaciones
+/// - Manejo de estados de carga y vacío
+/// - Diseño con tarjetas informativas
+///
+/// Flujo:
+/// 1. Al iniciar, carga las citas mediante AppointmentService
+/// 2. Renderiza la lista usando FutureBuilder
+/// 3. Actualiza la vista cuando:
+///    - Se agrega una nueva cita
+///    - Se edita una cita existente
+///    - Se elimina un registro
+///
+/// Dependencias
+/// - appointment_service.dart: Servicio para obtener datos de citas
+/// - actualizar_cita.dart: Pantalla de edición
+/// - agregar_cita.dart: Pantalla de creación de cita
+/// - functions.dart: Archivo de funciones
+/// - widgets/: Widgets a utilizar en la pantalla
+
 class CitasScreen extends StatefulWidget {
   const CitasScreen({super.key});
 
@@ -16,6 +42,7 @@ class CitasScreen extends StatefulWidget {
 class _CitasScreenState extends State<CitasScreen> {
   late Future<List<Map<String, dynamic>>> _appointmentsFuture;
 
+  /// Carga/re-carga la lista de citas desde el servicio
   Future<void> _loadAppointments() async {
     setState(() {
       _appointmentsFuture = AppointmentService.getAppointments();

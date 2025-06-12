@@ -4,6 +4,29 @@ import 'package:heraguard/widgets/appbar_widget.dart';
 import 'package:heraguard/widgets/custom_text_field.dart';
 import 'package:heraguard/widgets/drop_down_button_widget.dart';
 
+/// Pantalla de formulario para el registro de nuevos medicamentos en el sistema.
+/// Captura toda la información necesaria incluyendo nombre, dosis, frecuencia, vía de administración y duración del tratamiento.
+/// Características Principales
+/// - Formulario validado con campos obligatorios
+/// - Selectores desplegables para opciones predefinidas
+/// - Selectores de fecha y hora integrados
+/// - Validación en tiempo real del formulario
+///
+/// Flujo:
+/// 1. Captura y validación de datos en el formulario
+/// 2. Selección de opciones mediante dropdowns
+/// 3. Confirmación mediante botón de guardado
+/// 4. Envío de datos a través de función especializada
+///
+/// Validaciones
+/// - Todos los campos principales son obligatorios
+/// - Los dropdowns deben tener selección válida
+/// - Habilitación condicional del botón de guardado
+///
+/// Dependencias
+/// - functions.dart: Contiene lógica para mostrar selectores y guardar datos
+/// - widgets/: Widgets a utilizar en la pantalla
+
 class AgregarMedicamento extends StatefulWidget {
   const AgregarMedicamento({super.key});
 
@@ -25,6 +48,7 @@ class _AgregarMedicamentoState extends State<AgregarMedicamento> {
   String? _frequencyInitial;
   String? _durationInitial;
 
+  /// Maneja la selección de los dropdowns 
   void selectRoute(String? value) {
     setState(() {
       _routeInitial = value;
@@ -43,6 +67,7 @@ class _AgregarMedicamentoState extends State<AgregarMedicamento> {
     });
   }
 
+  /// Opciones para los dropdowns
   final List<String> _routesOfAdmin = [
     'Tomado (Oral)',
     'Inyectado',
@@ -66,6 +91,7 @@ class _AgregarMedicamentoState extends State<AgregarMedicamento> {
     'Permanente',
   ];
 
+  /// Valida si todos los campos requeridos están completos
   bool _formValid() {
     return _nameController.text.isNotEmpty &&
         _doseController.text.isNotEmpty &&
@@ -144,7 +170,7 @@ class _AgregarMedicamentoState extends State<AgregarMedicamento> {
                   SizedBox(height: 20),
                   CustomTextField(
                     controller: _specificTimeController,
-                    label: 'Hora Específica (Opcional)',
+                    label: 'Hora Específica',
                     icon: Icons.access_time,
                     onTap:
                         () => Functions.showTime(

@@ -6,6 +6,32 @@ import 'package:heraguard/widgets/appbar_widget.dart';
 import 'package:heraguard/widgets/sidebar.dart';
 import 'package:heraguard/screens/screens.dart';
 
+/// Pantalla principal para la visualización y gestión de medicamentos registrados.
+/// Muestra una lista interactiva de medicamentos con capacidad para agregar, editar y eliminar registros.
+/// Se integra con el MedicineService para obtener datos y actualizar la interfaz de manera reactiva.
+/// Características Principales
+/// - Muestra lista completa de medicamentos registrados
+/// - Permite agregar nuevos medicamentos
+/// - Ofrece funcionalidad de edición y eliminación por cada ítem
+/// - Actualización automática de la lista tras modificaciones
+/// - Manejo de estados de carga y vacío
+/// - Diseño con tarjetas informativas
+///
+/// Flujo:
+/// 1. Al iniciar, carga los medicamentos mediante MedicineService
+/// 2. Renderiza la lista usando FutureBuilder
+/// 3. Actualiza la vista cuando:
+///    - Se agrega un nuevo medicamento
+///    - Se edita un medicamento existente
+///    - Se elimina un registro
+///
+/// Dependencias
+/// - medicine_service.dart: Servicio para obtener datos de medicamentos
+/// - actualizar_medicamento.dart: Pantalla de edición
+/// - agregar_medicamento.dart: Pantalla de creación de medicamento
+/// - functions.dart: Archivo de funciones
+/// - widgets/: Widgets a utilizar en la pantalla
+
 class MedicamentosScreen extends StatefulWidget {
   const MedicamentosScreen({super.key});
 
@@ -16,6 +42,7 @@ class MedicamentosScreen extends StatefulWidget {
 class _MedicamentosScreenState extends State<MedicamentosScreen> {
   late Future<List<Map<String, dynamic>>> _medicationsFuture;
 
+  /// Carga/re-carga la lista de medicamentos desde el servicio
   Future<void> _loadMedications() async {
     setState(() {
       _medicationsFuture = MedicineService.getMedications();
@@ -95,12 +122,11 @@ class _MedicamentosScreenState extends State<MedicamentosScreen> {
                                                 context,
                                                 MaterialPageRoute(
                                                   builder:
-                                                      (
-                                                        context,
-                                                      ) => ActualizarMedicamento(
-                                                        idMedicine:
-                                                            medicine['id'],
-                                                      ),
+                                                      (context) =>
+                                                          ActualizarMedicamento(
+                                                            idMedicine:
+                                                                medicine['id'],
+                                                          ),
                                                 ),
                                               );
 

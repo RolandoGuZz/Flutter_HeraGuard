@@ -4,6 +4,33 @@ import 'package:heraguard/services/appointment_service.dart';
 import 'package:heraguard/widgets/appbar_widget.dart';
 import 'package:heraguard/widgets/custom_text_field.dart';
 
+/// Pantalla para modificar los datos de una cita existente.
+/// Precarga la información actual de la cita y permite su actualización mediante un formulario validado.
+/// Características Principales
+/// - Precarga datos existentes de la cita seleccionada
+/// - Formulario con validación de campos obligatorios
+/// - Selectores de fecha/hora integrados
+/// - Integración con servicio de actualización
+/// - Actualización reactiva de la interfaz
+///
+/// Parámetros Requeridos
+/// - [idAppointment]: ID de la cita a editar
+///
+/// Flujo:
+/// 1. Carga inicial de datos de la cita (initState)
+/// 2. Validación en tiempo real de campos
+/// 3. Envío de datos actualizados al servicio
+///
+/// Validaciones
+/// - Fecha, hora y dirección son campos obligatorios
+/// - Nombre del doctor es opcional
+/// - Botón deshabilitado hasta validación completa
+///
+/// Dependencias
+/// - appointment_service.dart: Servicio para obtener/actualizar datos de citas
+/// - functions.dart: Funciones para selectores y actualización
+/// - widgets/: Widgets a utilizar en la pantalla
+
 class ActualizarCita extends StatefulWidget {
   final String idAppointment;
   const ActualizarCita({super.key, required this.idAppointment});
@@ -20,18 +47,22 @@ class _ActualizarCitaState extends State<ActualizarCita> {
 
   final _formKey = GlobalKey<FormState>();
 
+  /// Valida si los campos obligatorios contienen datos
   bool _formCitaValido() {
     return _dateController.text.isNotEmpty &&
         _timeController.text.isNotEmpty &&
         _addressController.text.isNotEmpty;
   }
 
+  /// Configura listeners para actualización reactiva
   @override
   void initState() {
     super.initState();
     _dateController.addListener(_updateState);
     _timeController.addListener(_updateState);
     _addressController.addListener(_updateState);
+
+    /// Carga los datos actuales de la cita
     AppointmentService.getAppointment(idAppointment: widget.idAppointment).then(
       (appointment) {
         if (mounted) {

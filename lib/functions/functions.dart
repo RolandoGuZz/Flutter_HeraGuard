@@ -8,8 +8,21 @@ import 'package:heraguard/services/notification_service.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+/// Clase que centraliza las funciones a utilizar en la aplicación.
+/// Proporciona métodos estáticos para operaciones comunes que pueden ser invocados desde cualquier parte del código.
+/// Dependencias:
+/// - flutter_local_notifications: Para gestión de notificaciones locales
+/// - intl: Para formato de fechas y horas
+/// - timezone: Para manejo de zonas horarias en notificaciones
+/// - appointment_service.dart: Servicio de operaciones con citas
+/// - medicine_service.dart: Servicio de operaciones con medicamentos
+/// - notification_service.dart: Servicio de gestión de notificaciones
+
+
+//!Documenrar cada funciono pero hay que ver si se separa, si no dejarlo asi
 class Functions {
   static int _idNoti = 0;
+  static int _idNotiMedi = 0;
 
   static Future<void> showCalendar({
     required BuildContext context,
@@ -237,6 +250,8 @@ class Functions {
             ),
       );
       if (confirm == true) {
+        print('Eliminando noti de medi con id $_idNotiMedi');
+        await FlutterLocalNotificationsPlugin().cancel(_idNotiMedi);
         await MedicineService.deleteMedicine(idMedicine: idMedicine);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -307,38 +322,6 @@ class Functions {
     Navigator.pop(context, true);
   }
 
-  // static Future<void> programarNotificacionesDeCitas() async {
-  //   final citas = await AppointmentService.getAppointments();
-  //   //await NotificationService.requestPermissions();
-  //   for (var cita in citas) {
-  //     final String fechaStr = cita['date'];
-  //     final String horaStr = cita['time'];
-  //     final String doctor =
-  //         (cita['doctor'] ?? '').isEmpty ? 'Médico' : cita['doctor'];
-  //     final String direccion = cita['address'] ?? 'Dirección desconocida';
-  //     _idNoti = cita['idNoti'];
-  //     try {
-  //       final DateFormat formato = DateFormat('dd/MM/yyyy h:mm a');
-  //       final DateTime fechaHora = formato.parse('$fechaStr $horaStr');
-  //       print('Programando noti ID $_idNoti para $fechaHora');
-  //       try {
-  //         await NotificationService.scheduleNotificationExact(
-  //           id: _idNoti,
-  //           title: 'Tienes cita médica con $doctor',
-  //           body: 'Lugar: $direccion, Hora $horaStr',
-  //           dateTime: fechaHora,
-  //         );
-  //       } catch (e) {
-  //         print('Error al crear la noti');
-  //       }
-  //       print('Nofi enviada');
-  //     } catch (e) {
-  //       //throw Exception('Error al programar notificación: $e');
-  //       print('Error al programar notificación: $e');
-  //     }
-  //   }
-  // }
-
   static Future<void> programarNotificacionesDeCitas() async {
     final citas = await AppointmentService.getAppointments();
 
@@ -349,7 +332,6 @@ class Functions {
           (cita['doctor'] ?? '').isEmpty ? 'Médico' : cita['doctor'];
       final String direccion = cita['address'] ?? 'Dirección desconocida';
       _idNoti = cita['idNoti'];
-
       try {
         final DateFormat formato = DateFormat('dd/MM/yyyy h:mm a');
         final DateTime fechaHora = formato.parse('$fechaStr $horaStr');
@@ -358,26 +340,61 @@ class Functions {
           tz.local,
         );
         final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-
         print('Programando noti ID $_idNoti para $fechaHoraTZ (ahora: $now)');
-
         if (!fechaHoraTZ.isAfter(now)) {
           print(
             '❌ No se programó la notificación ID $_idNoti porque la fecha ya pasó',
           );
           continue;
         }
-
         await NotificationService.scheduleNotificationExact(
           id: _idNoti,
           title: 'Tienes cita médica con $doctor',
           body: 'Lugar: $direccion, Hora $horaStr',
           dateTime: fechaHora,
         );
-
         print('✅ Notificación ID $_idNoti programada correctamente');
       } catch (e) {
         print('❌ Error al programar notificación ID $_idNoti: $e');
+      }
+    }
+  }
+
+  static Future<void> programarNotificacionesDeMedicamentos() async {
+    final medicamentos = await MedicineService.getMedications();
+
+    for (var medicamento in medicamentos) {
+      final String nombre = medicamento['name'] ?? 'Medicamento';
+      final String dosis = medicamento['dose'] ?? '';
+      final String horaStr = medicamento['specificTime'];
+      _idNotiMedi = (medicamento['idNotiM'] ?? 0);
+
+      try {
+        final now = DateTime.now();
+        final horaFormat = DateFormat('h:mm a');
+        final horaMedicamento = horaFormat.parse(horaStr);
+        final fechaNotificacion = DateTime(
+          now.year,
+          now.month,
+          now.day,
+          horaMedicamento.hour,
+          horaMedicamento.minute,
+        );
+
+        print('Programando noti ID $_idNotiMedi para $fechaNotificacion');
+        if (!fechaNotificacion.isAfter(now)) {
+          print('❌ Hora ya pasó hoy para $nombre');
+          continue;
+        }
+        await NotificationService.scheduleNotificationExact(
+          id: _idNotiMedi,
+          title: 'Hora de tomar $nombre',
+          body: 'Dosis: $dosis',
+          dateTime: fechaNotificacion,
+        );
+        print('✅ Notificación para $nombre programada');
+      } catch (e) {
+        print('❌ Error con medicamento ID $_idNotiMedi: $e');
       }
     }
   }

@@ -7,6 +7,32 @@ import 'package:heraguard/screens/login/login_screen.dart';
 import 'package:heraguard/screens/screens.dart';
 import 'package:heraguard/widgets/custom_text_field.dart';
 
+/// Esta pantalla permite a los usuarios crear una nueva cuenta en la aplicación mediante el registro con email y contraseña.
+/// Se integra con Firebase Auth para la autenticación y Firestore para almacenar información adicional del usuario.
+/// Características Principales
+/// - Formulario de registro con validación de campos
+/// - Integración con Firebase Authentication para creación de cuentas
+/// - Almacenamiento de información en Firestore
+/// - Manejo de errores durante el registro
+/// - Transición automática a la pantalla de citas tras registro exitoso
+/// - Enlace alternativo para usuarios existentes (login)
+///
+/// Maneja las siguientes excepciones de FirebaseAuth:
+/// - 'weak-password': Contraseña demasiado débil
+/// - 'email-already-in-use': Email ya registrado
+/// - 'invalid-email': Formato de email inválido
+///
+/// - En éxito: Navega a CitasScreen y muestra snackbar de bienvenida
+/// - En error: Muestra snackbar con descripción del error
+///
+/// Dependencias
+/// - firebase_auth: Para autenticación de usuarios
+/// - cloud_firestore: Para almacenar datos del usuario
+/// - flutter/material.dart: Para widgets de UI
+/// - screens.dart: Para navegación entre pantallas
+/// - login_screen.dart: Pantalla alternativa para usuarios existentes
+/// - custom_text_field.dart: Widget personalizado para campos de texto
+
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -19,9 +45,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
-
+//!Checar lo de la Key
   //final _formKey = GlobalKey<FormState>();
 
+  /// Resgistra un nuevo usuario
+  /// Flujo:
+  /// 1. Activa el estado de carga
+  /// 2. Crea usuario en Firebase Auth
+  /// 3. Almacena nombre del usuario en Firestore
+  /// 4. Muestra feedback al usuario
+  /// 5. Navega a otra pantalla al tener éxito
+  /// 
+  /// Excepciones:
+  /// Captura FirebaseAuthException y muestra mensajes apropiados al usuario
   Future<void> _register() async {
     //if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
@@ -50,7 +86,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+        MaterialPageRoute(builder: (context) => CitasScreen()),
       );
     } on FirebaseAuthException catch (error) {
       String errorMessage = 'Error al crear la cuenta';
@@ -79,10 +115,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  /// Navega a la pantalla de login
   void _navigateToLogin() {
     Navigator.push(context, MaterialPageRoute(builder: (_) => LoginScreen()));
   }
 
+  /// Valida si el formulario de registro está completo
+  /// Retorna:
+  /// - true: Si todos los campos tienen contenido
+  /// - false: Si algún campo está vacío
   bool _formRegisterValido() {
     return _nameController.text.isNotEmpty &&
         _emailController.text.isNotEmpty &&

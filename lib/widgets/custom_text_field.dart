@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 
+/// Clase para crear un campo de texto personalizado.
+/// Características:
+/// - Estilo consistente con bordes negros y azul al enfocar
+/// - Cuenta con icono personalizado
+/// - Múltiples opciones de teclado (email, número, etc.)
+/// - Configuración de capitalización de texto
+/// - Modo de solo lectura
+/// - Texto oculto (para contraseñas)
+
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final bool readOnly;

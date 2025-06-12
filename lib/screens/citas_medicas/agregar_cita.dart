@@ -3,6 +3,30 @@ import 'package:heraguard/functions/functions.dart';
 import 'package:heraguard/widgets/appbar_widget.dart';
 import 'package:heraguard/widgets/custom_text_field.dart';
 
+/// Pantalla de formulario para el registro de nuevas citas médicas en el sistema.
+/// Captura información esencial como fecha, hora, doctor (opcional) y dirección.
+/// Características Principales
+/// - Formulario validado con campos obligatorios
+/// - Selectores de fecha y hora integrados
+/// - Validación en tiempo real del formulario
+/// - Campo opcional para nombre del doctor
+///
+/// Flujo:
+/// 1. Selección de fecha y hora mediante pickers
+/// 2. Captura de datos de la cita
+/// 3. Validación automática del formulario
+/// 4. Confirmación mediante botón de guardado
+/// 5. Envío de datos a través de función especializada
+///
+/// Validaciones
+/// - Fecha, hora y dirección son campos obligatorios
+/// - Nombre del doctor es opcional
+/// - Habilitación condicional del botón de guardado
+///
+/// Dependencias
+/// - functions.dart: Contiene lógica para mostrar selectores y guardar datos
+/// - widgets/: Widgets a utilizar en la pantalla
+
 class AgregarCita extends StatefulWidget {
   const AgregarCita({super.key});
 
@@ -18,6 +42,7 @@ class _AgregarCitaState extends State<AgregarCita> {
 
   final _formKey = GlobalKey<FormState>();
 
+  /// Valida si todos los campos requeridos están completos
   bool _formCitaValido() {
     return _dateController.text.isNotEmpty &&
         _timeController.text.isNotEmpty &&

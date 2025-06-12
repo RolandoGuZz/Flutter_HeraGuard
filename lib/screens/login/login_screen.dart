@@ -3,6 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:heraguard/widgets/custom_text_field.dart';
 import 'package:heraguard/screens/screens.dart';
 
+/// Esta pantalla permite a los usuarios existentes autenticarse en la aplicación mediante email y contraseña.
+/// Se integra con Firebase Auth para el proceso de autenticación y maneja la navegación a la pantalla principal tras el login exitoso.
+/// Características Principales
+/// - Formulario de login con validación básica de campos
+/// - Integración con Firebase Authentication
+/// - Manejo de errores durante la autenticación
+/// - Transición automática a la pantalla de citas tras autenticación exitosa
+/// - Enlace alternativo para nuevos usuarios (registro)
+/// - Feedback visual mediante SnackBars
+///
+/// Maneja las siguientes excepciones de FirebaseAuth:
+/// - 'invalid-email': Formato de email inválido
+/// - 'invalid-credential': Credenciales incorrectas
+///
+/// - En éxito: Navega a CitasScreen y muestra snackbar de bienvenida
+/// - En error: Muestra snackbar con descripción del error
+///
+/// Dependencias
+/// - firebase_auth: Para autenticación de usuarios
+/// - flutter/material.dart: Para widgets de UI
+/// - screens.dart: Para navegación entre pantallas
+/// - custom_text_field.dart: Widget personalizado para campos de texto
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -14,9 +37,19 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
-
+  //!Checar si se borra
   //final _formKeyLogin = GlobalKey<FormState>();
 
+  /// Autentica al usuario con Firebase Auth
+  /// Flujo:
+  /// 1. Activa el estado de carga
+  /// 2. Autenticar al usuario con Firebase
+  /// 3. Muestra feedback al usuario
+  /// 4. Navega a CitasScreen en éxito
+  /// 5. Maneja errores específicos de Firebase
+  ///
+  /// Excepciones:
+  /// Captura FirebaseAuthException y muestra mensajes apropiados al usuario
   Future<void> _submitForm() async {
     //if (!_formKeyLogin.currentState!.validate()) return;
     setState(() => _isLoading = true);
@@ -42,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => HomeScreen()),
+        MaterialPageRoute(builder: (_) => CitasScreen()),
       );
     } on FirebaseAuthException catch (error) {
       String errorMessage = 'Error al iniciar sesión';
@@ -67,6 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  /// Navega a la pantalla de registro
   void _navigateToRegister() {
     Navigator.push(
       context,
@@ -74,6 +108,10 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  /// Valida si el formulario de registro está completo
+  /// Retorna:
+  /// - true: Si todos los campos tienen contenido
+  /// - false: Si algún campo está vacío
   bool _formLoginValido() {
     return _emailController.text.isNotEmpty &&
         _passwordController.text.isNotEmpty;

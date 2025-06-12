@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:heraguard/routes/my_routes.dart';
 
+/// Pantalla de presentación inicial que se muestra al abrir la aplicación.
+/// Realiza las siguientes funciones:
+/// - Muestra el logo y nombre de la aplicación "HeraGuard"
+/// - Mantiene una animación de carga durante 2 segundos
+/// - Navega automáticamente a la ruta inicial definida en [MyRoutes.initialRoute] que es el login
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 

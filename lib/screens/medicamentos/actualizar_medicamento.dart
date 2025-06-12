@@ -5,6 +5,33 @@ import 'package:heraguard/widgets/appbar_widget.dart';
 import 'package:heraguard/widgets/custom_text_field.dart';
 import 'package:heraguard/widgets/drop_down_button_widget.dart';
 
+/// Pantalla para modificar los datos de un medicamento existente.
+/// Precarga la información actual del medicamento y permite su actualización mediante un formulario validado.
+/// Características Principales
+/// - Precarga datos existentes del medicamento seleccionado
+/// - Formulario con validación de campos obligatorios
+/// - Selectores desplegables para opciones predefinidas
+/// - Integración con servicio de actualización
+/// - Actualización reactiva de la interfaz
+///
+/// Parámetros Requeridos
+/// - [idMedicine]: ID del medicamento a editar
+///
+/// Flujo:
+/// 1. Carga inicial de datos del medicamento (initState)
+/// 3. Validación en tiempo real de campos
+/// 4. Envío de datos actualizados al servicio
+///
+/// Validaciones
+/// - Todos los campos principales son obligatorios
+/// - Los dropdowns deben mantener selección válida
+/// - Botón deshabilitado hasta validación completa
+///
+/// Dependencias
+/// - medicine_service.dart: Servicio para obtener/actualizar datos
+/// - functions.dart: Funciones para selectores y actualización
+/// - widgets/: Widgets a utilizar en la pantalla
+
 class ActualizarMedicamento extends StatefulWidget {
   final String idMedicine;
   const ActualizarMedicamento({super.key, required this.idMedicine});
@@ -27,6 +54,7 @@ class _ActualizarMedicamentoState extends State<ActualizarMedicamento> {
   String? _frequencyInitial;
   String? _durationInitial;
 
+  /// Maneja la selección de los dropdowns
   void selectRoute(String? value) {
     setState(() {
       _routeInitial = value;
@@ -45,6 +73,7 @@ class _ActualizarMedicamentoState extends State<ActualizarMedicamento> {
     });
   }
 
+  /// Opciones para los dropdowns
   final List<String> _routesOfAdmin = [
     'Tomado (Oral)',
     'Inyectado',
@@ -68,6 +97,7 @@ class _ActualizarMedicamentoState extends State<ActualizarMedicamento> {
     'Permanente',
   ];
 
+  /// Valida si el formulario está completo
   bool _formValid() {
     return _nameController.text.isNotEmpty &&
         _doseController.text.isNotEmpty &&
@@ -78,6 +108,7 @@ class _ActualizarMedicamentoState extends State<ActualizarMedicamento> {
         _durationInitial != null;
   }
 
+  /// Configura listeners para actualización reactiva
   @override
   void initState() {
     super.initState();
@@ -85,6 +116,8 @@ class _ActualizarMedicamentoState extends State<ActualizarMedicamento> {
     _doseController.addListener(_updateState);
     _durationNumberController.addListener(_updateState);
     _startDateController.addListener(_updateState);
+
+    /// Carga los datos actuales del medicamento
     MedicineService.getMedicine(idMedicine: widget.idMedicine).then((medicine) {
       if (mounted) {
         setState(() {

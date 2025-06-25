@@ -1,16 +1,39 @@
-# heraguard
+# HeraGuard
 
-A new Flutter project.
+App móvil que te ayuda a:
+- Recordar tus citas médicas con alertas  
+- Controlar tus medicamentos y horarios  
 
-## Getting Started
+Todo en una interfaz sencilla diseñada para adultos mayores.
 
-This project is a starting point for a Flutter application.
+## 📋 Requisitos
+- Flutter SDK instalado.
+- Android Studio, VS Code o cualquier IDE compatible con Flutter.
+- Emulador o dispositivo físico para ejecutar la aplicación.
 
-A few resources to get you started if this is your first Flutter project:
+## 🛠️ Instalación
+1. Clona el repositorio:
+```
+git clone https://github.com/RolandoGuZz/Flutter_HeraGuard.git
+```
+2. Instala las dependencias:
+```
+flutter pub get
+```
+3. Ejecuta el proyecto
+```
+flutter run
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## 🚀 Funcionalidades Implementadas
+- CRUD completo para la gestión de citas médicas y medicamentos.
+- Alertas para recordar citas y horarios de medicación.
+- Navegación sencilla entre pantallas.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 📱 Tecnologías Utilizadas
+| Componente       | Tecnología           |
+|------------------|---------------------|
+| Frontend         | Flutter (Dart)      |
+| Autenticación    | Firebase Auth       |
+| Base de datos    | Cloud Firestore     |
+| Notificaciones   | flutter_local_notifications |

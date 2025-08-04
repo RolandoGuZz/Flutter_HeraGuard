@@ -3,6 +3,7 @@ import 'package:heraguard/functions/functions.dart';
 import 'package:heraguard/services/appointment_service.dart';
 import 'package:heraguard/widgets/appbar_widget.dart';
 import 'package:heraguard/widgets/custom_text_field.dart';
+// import 'package:heraguard/models/appointment.dart';
 
 /// Pantalla para modificar los datos de una cita existente.
 /// Precarga la información actual de la cita y permite su actualización mediante un formulario validado.
@@ -67,10 +68,10 @@ class _ActualizarCitaState extends State<ActualizarCita> {
       (appointment) {
         if (mounted) {
           setState(() {
-            _dateController.text = appointment['date'] ?? '';
-            _timeController.text = appointment['time'] ?? '';
-            _addressController.text = appointment['address'] ?? '';
-            _doctorController.text = appointment['doctor'] ?? '';
+            _dateController.text = appointment.date;
+            _timeController.text = appointment.time;
+            _addressController.text = appointment.address;
+            _doctorController.text = appointment.doctor ?? '';
           });
         }
       },

@@ -2,11 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:heraguard/models/medicine_model.dart';
 import 'package:heraguard/services/appointment_service.dart';
 import 'package:heraguard/services/medicine_service.dart';
 import 'package:heraguard/services/notification_service.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:heraguard/models/appointment_model.dart';
 
 /// Clase que centraliza las funciones a utilizar en la aplicación.
 /// Proporciona métodos estáticos para operaciones comunes que pueden ser invocados desde cualquier parte del código.
@@ -52,19 +54,51 @@ class Functions {
     }
   }
 
+  // static Future<void> guardarCita({
+  //   required BuildContext context,
+  //   required TextEditingController dateController,
+  //   required TextEditingController timeController,
+  //   required TextEditingController doctorController,
+  //   required TextEditingController addressController,
+  // }) async {
+  //   await AppointmentService.addAppointment(
+  //     date: dateController.text,
+  //     time: timeController.text,
+  //     doctor: doctorController.text,
+  //     address: addressController.text,
+  //   );
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: Text(
+  //         'Cita guardada con éxito',
+  //         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  //       ),
+  //       backgroundColor: Color.fromRGBO(35, 150, 230, 1),
+  //     ),
+  //   );
+  //   Navigator.pop(context, true);
+  // }
+
   static Future<void> guardarCita({
-    required BuildContext context,
-    required TextEditingController dateController,
-    required TextEditingController timeController,
-    required TextEditingController doctorController,
-    required TextEditingController addressController,
-  }) async {
-    await AppointmentService.addAppointment(
-      date: dateController.text,
-      time: timeController.text,
-      doctor: doctorController.text,
-      address: addressController.text,
-    );
+  required BuildContext context,
+  required TextEditingController dateController,
+  required TextEditingController timeController,
+  required TextEditingController doctorController,
+  required TextEditingController addressController,
+}) async {
+  // Creamos el objeto Appointment con los datos del formulario
+  final nuevaCita = Appointment(
+    idNoti: 0, // El servicio asignará el valor correcto
+    date: dateController.text,
+    time: timeController.text,
+    doctor: doctorController.text.isNotEmpty ? doctorController.text : null,
+    address: addressController.text,
+  );
+
+  try {
+    // Pasamos el objeto al servicio
+    await AppointmentService.addAppointment(nuevaCita);
+    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -75,7 +109,18 @@ class Functions {
       ),
     );
     Navigator.pop(context, true);
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Error al guardar la cita: ${e.toString()}',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
+}
 
   static Future<void> eliminarCita({
     required BuildContext context,
@@ -150,24 +195,61 @@ class Functions {
     }
   }
 
+  // static Future<void> actualizarCita({
+  //   required BuildContext context,
+  //   required String idAppointment,
+  //   required TextEditingController dateController,
+  //   required TextEditingController timeController,
+  //   required TextEditingController doctorController,
+  //   required TextEditingController addressController,
+  // }) async {
+  //   final updateData = {
+  //     'date': dateController.text,
+  //     'time': timeController.text,
+  //     'doctor': doctorController.text,
+  //     'address': addressController.text,
+  //   };
+  //   await AppointmentService.updateAppointment(
+  //     idAppointment: idAppointment,
+  //     data: updateData,
+  //   );
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: Text(
+  //         'Cita actualizada con éxito',
+  //         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  //       ),
+  //       backgroundColor: Color.fromRGBO(35, 150, 230, 1),
+  //     ),
+  //   );
+  //   Navigator.pop(context, true);
+  // }
+
   static Future<void> actualizarCita({
-    required BuildContext context,
-    required String idAppointment,
-    required TextEditingController dateController,
-    required TextEditingController timeController,
-    required TextEditingController doctorController,
-    required TextEditingController addressController,
-  }) async {
-    final updateData = {
-      'date': dateController.text,
-      'time': timeController.text,
-      'doctor': doctorController.text,
-      'address': addressController.text,
-    };
-    await AppointmentService.updateAppointment(
+  required BuildContext context,
+  required String idAppointment,
+  required TextEditingController dateController,
+  required TextEditingController timeController,
+  required TextEditingController doctorController,
+  required TextEditingController addressController,
+}) async {
+  try {
+    // Primero obtenemos la cita existente para preservar el idNoti
+    final citaExistente = await AppointmentService.getAppointment(
       idAppointment: idAppointment,
-      data: updateData,
     );
+
+    // Creamos el objeto Appointment con los datos actualizados
+    final citaActualizada = citaExistente.copyWith(
+      date: dateController.text,
+      time: timeController.text,
+      doctor: doctorController.text.isNotEmpty ? doctorController.text : null,
+      address: addressController.text,
+    );
+
+    // Enviamos la cita actualizada al servicio
+    await AppointmentService.updateAppointment(citaActualizada);
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -178,29 +260,82 @@ class Functions {
       ),
     );
     Navigator.pop(context, true);
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Error al actualizar la cita: ${e.toString()}',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
+}
+
+  // static Future<void> guardarMedicamento({
+  //   required BuildContext context,
+  //   required String? routeValue,
+  //   required TextEditingController nameController,
+  //   required TextEditingController doseController,
+  //   required String? frequencyValue,
+  //   required TextEditingController specificTimeController,
+  //   required String? durationValue,
+  //   required TextEditingController durationController,
+  //   required TextEditingController startDateController,
+  // }) async {
+  //   await MedicineService.addMedicine(
+  //     route: routeValue,
+  //     name: nameController.text,
+  //     dose: doseController.text,
+  //     frequency: frequencyValue,
+  //     specificTime: specificTimeController.text,
+  //     duration: durationValue,
+  //     durationNumber: durationController.text,
+  //     startDate: startDateController.text,
+  //   );
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: Text(
+  //         'Medicamento guardado con éxito',
+  //         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  //       ),
+  //       backgroundColor: Color.fromRGBO(35, 150, 230, 1),
+  //     ),
+  //   );
+  //   Navigator.pop(context, true);
+  // }
 
   static Future<void> guardarMedicamento({
-    required BuildContext context,
-    required String? routeValue,
-    required TextEditingController nameController,
-    required TextEditingController doseController,
-    required String? frequencyValue,
-    required TextEditingController specificTimeController,
-    required String? durationValue,
-    required TextEditingController durationController,
-    required TextEditingController startDateController,
-  }) async {
-    await MedicineService.addMedicine(
+  required BuildContext context,
+  required String? routeValue,
+  required TextEditingController nameController,
+  required TextEditingController doseController,
+  required String? frequencyValue,
+  required TextEditingController specificTimeController,
+  required String? durationValue,
+  required TextEditingController durationController,
+  required TextEditingController startDateController,
+}) async {
+  try {
+    // Creamos el objeto Medicamento con los datos del formulario
+    final nuevoMedicamento = Medicine(
+      idNotiM: 0, // El servicio asignará el ID correcto
       route: routeValue,
       name: nameController.text,
       dose: doseController.text,
       frequency: frequencyValue,
-      specificTime: specificTimeController.text,
+      specificTime: specificTimeController.text.isNotEmpty 
+          ? specificTimeController.text 
+          : null,
       duration: durationValue,
       durationNumber: durationController.text,
       startDate: startDateController.text,
     );
+
+    // Pasamos el objeto al servicio
+    await MedicineService.addMedicine(nuevoMedicamento);
+    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -211,7 +346,18 @@ class Functions {
       ),
     );
     Navigator.pop(context, true);
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Error al guardar medicamento: ${e.toString()}',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
+}
 
   static Future<void> eliminarMedicamento({
     required BuildContext context,
@@ -284,32 +430,79 @@ class Functions {
     }
   }
 
+  // static Future<void> actualizarMedicamento({
+  //   required BuildContext context,
+  //   required String idMedicine,
+  //   required String? routeValue,
+  //   required TextEditingController nameController,
+  //   required TextEditingController doseController,
+  //   required String? frequencyValue,
+  //   required TextEditingController specificTimeController,
+  //   required String? durationValue,
+  //   required TextEditingController durationController,
+  //   required TextEditingController startDateController,
+  // }) async {
+  //   final updateData = {
+  //     'route': routeValue,
+  //     'name': nameController.text,
+  //     'dose': doseController.text,
+  //     'frequency': frequencyValue,
+  //     'specificTime': specificTimeController.text,
+  //     'duration': durationValue,
+  //     'durationNumber': durationController.text,
+  //     'startDate': startDateController.text,
+  //   };
+  //   await MedicineService.updateMedicine(
+  //     idMedicine: idMedicine,
+  //     data: updateData,
+  //   );
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: Text(
+  //         'Medicamento actualizado con éxito',
+  //         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  //       ),
+  //       backgroundColor: Color.fromRGBO(35, 150, 230, 1),
+  //     ),
+  //   );
+  //   Navigator.pop(context, true);
+  // }
+
   static Future<void> actualizarMedicamento({
-    required BuildContext context,
-    required String idMedicine,
-    required String? routeValue,
-    required TextEditingController nameController,
-    required TextEditingController doseController,
-    required String? frequencyValue,
-    required TextEditingController specificTimeController,
-    required String? durationValue,
-    required TextEditingController durationController,
-    required TextEditingController startDateController,
-  }) async {
-    final updateData = {
-      'route': routeValue,
-      'name': nameController.text,
-      'dose': doseController.text,
-      'frequency': frequencyValue,
-      'specificTime': specificTimeController.text,
-      'duration': durationValue,
-      'durationNumber': durationController.text,
-      'startDate': startDateController.text,
-    };
-    await MedicineService.updateMedicine(
+  required BuildContext context,
+  required String idMedicine,
+  required String? routeValue,
+  required TextEditingController nameController,
+  required TextEditingController doseController,
+  required String? frequencyValue,
+  required TextEditingController specificTimeController,
+  required String? durationValue,
+  required TextEditingController durationController,
+  required TextEditingController startDateController,
+}) async {
+  try {
+    // Primero obtenemos el medicamento existente para preservar el idNotiM
+    final medicamentoExistente = await MedicineService.getMedicine(
       idMedicine: idMedicine,
-      data: updateData,
     );
+
+    // Creamos el objeto Medicamento con los datos actualizados
+    final medicamentoActualizado = medicamentoExistente.copyWith(
+      route: routeValue,
+      name: nameController.text,
+      dose: doseController.text,
+      frequency: frequencyValue,
+      specificTime: specificTimeController.text.isNotEmpty 
+          ? specificTimeController.text 
+          : null,
+      duration: durationValue,
+      durationNumber: durationController.text,
+      startDate: startDateController.text,
+    );
+
+    // Enviamos el medicamento actualizado al servicio
+    await MedicineService.updateMedicine(medicamentoActualizado);
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -320,54 +513,103 @@ class Functions {
       ),
     );
     Navigator.pop(context, true);
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Error al actualizar medicamento: ${e.toString()}',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
+}
+
+  // static Future<void> programarNotificacionesDeCitas() async {
+  //   final citas = await AppointmentService.getAppointments();
+
+  //   for (var cita in citas) {
+  //     final String fechaStr = cita['date'];
+  //     final String horaStr = cita['time'];
+  //     final String doctor =
+  //         (cita['doctor'] ?? '').isEmpty ? 'Médico' : cita['doctor'];
+  //     final String direccion = cita['address'] ?? 'Dirección desconocida';
+  //     _idNoti = cita['idNoti'];
+  //     try {
+  //       final DateFormat formato = DateFormat('dd/MM/yyyy h:mm a');
+  //       final DateTime fechaHora = formato.parse('$fechaStr $horaStr');
+  //       final tz.TZDateTime fechaHoraTZ = tz.TZDateTime.from(
+  //         fechaHora,
+  //         tz.local,
+  //       );
+  //       final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+  //       print('Programando noti ID $_idNoti para $fechaHoraTZ (ahora: $now)');
+  //       if (!fechaHoraTZ.isAfter(now)) {
+  //         print(
+  //           '❌ No se programó la notificación ID $_idNoti porque la fecha ya pasó',
+  //         );
+  //         continue;
+  //       }
+  //       await NotificationService.scheduleNotificationExact(
+  //         id: _idNoti,
+  //         title: 'Tienes cita médica con $doctor',
+  //         body: 'Lugar: $direccion, Hora $horaStr',
+  //         dateTime: fechaHora,
+  //       );
+  //       print('✅ Notificación ID $_idNoti programada correctamente');
+  //     } catch (e) {
+  //       print('❌ Error al programar notificación ID $_idNoti: $e');
+  //     }
+  //   }
+  // }
 
   static Future<void> programarNotificacionesDeCitas() async {
-    final citas = await AppointmentService.getAppointments();
+  try {
+    final List<Appointment> citas = await AppointmentService.getAppointments();
 
-    for (var cita in citas) {
-      final String fechaStr = cita['date'];
-      final String horaStr = cita['time'];
-      final String doctor =
-          (cita['doctor'] ?? '').isEmpty ? 'Médico' : cita['doctor'];
-      final String direccion = cita['address'] ?? 'Dirección desconocida';
-      _idNoti = cita['idNoti'];
+    for (final cita in citas) {
       try {
+        final doctor = cita.hasDoctor ? cita.doctor! : 'Médico';
+        final direccion = cita.address.isNotEmpty ? cita.address : 'Dirección desconocida';
+        
         final DateFormat formato = DateFormat('dd/MM/yyyy h:mm a');
-        final DateTime fechaHora = formato.parse('$fechaStr $horaStr');
-        final tz.TZDateTime fechaHoraTZ = tz.TZDateTime.from(
-          fechaHora,
-          tz.local,
-        );
+        final DateTime fechaHora = formato.parse(cita.fullDateTime);
+        final tz.TZDateTime fechaHoraTZ = tz.TZDateTime.from(fechaHora, tz.local);
         final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-        print('Programando noti ID $_idNoti para $fechaHoraTZ (ahora: $now)');
+
+        print('Programando noti ID ${cita.idNoti} para $fechaHoraTZ (ahora: $now)');
+        
         if (!fechaHoraTZ.isAfter(now)) {
-          print(
-            '❌ No se programó la notificación ID $_idNoti porque la fecha ya pasó',
-          );
+          print('❌ No se programó la notificación ID ${cita.idNoti} porque la fecha ya pasó');
           continue;
         }
+
         await NotificationService.scheduleNotificationExact(
-          id: _idNoti,
+          id: cita.idNoti,
           title: 'Tienes cita médica con $doctor',
-          body: 'Lugar: $direccion, Hora $horaStr',
+          body: 'Lugar: $direccion, Hora ${cita.time}',
           dateTime: fechaHora,
         );
-        print('✅ Notificación ID $_idNoti programada correctamente');
+        
+        print('✅ Notificación ID ${cita.idNoti} programada correctamente');
       } catch (e) {
-        print('❌ Error al programar notificación ID $_idNoti: $e');
+        print('❌ Error al programar notificación ID ${cita.idNoti}: $e');
       }
     }
+  } catch (e) {
+    print('❌ Error al obtener citas: $e');
   }
+}
 
   static Future<void> programarNotificacionesDeMedicamentos() async {
     final medicamentos = await MedicineService.getMedications();
 
     for (var medicamento in medicamentos) {
-      final String nombre = medicamento['name'] ?? 'Medicamento';
-      final String dosis = medicamento['dose'] ?? '';
-      final String horaStr = medicamento['specificTime'];
-      _idNotiMedi = (medicamento['idNotiM'] ?? 0);
+      final String nombre = medicamento.name;
+      final String dosis = medicamento.dose;
+      final String horaStr = medicamento.specificTime ?? '';
+      _idNotiMedi = (medicamento.idNotiM);
 
       try {
         final now = DateTime.now();

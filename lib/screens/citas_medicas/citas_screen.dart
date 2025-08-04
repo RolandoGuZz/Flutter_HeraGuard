@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:heraguard/functions/functions.dart';
+import 'package:heraguard/models/appointment_model.dart';
 import 'package:heraguard/screens/citas_medicas/actualizar_cita.dart';
 import 'package:heraguard/screens/screens.dart';
 import 'package:heraguard/services/appointment_service.dart';
@@ -40,7 +41,7 @@ class CitasScreen extends StatefulWidget {
 }
 
 class _CitasScreenState extends State<CitasScreen> {
-  late Future<List<Map<String, dynamic>>> _appointmentsFuture;
+  late Future<List<Appointment>> _appointmentsFuture;
 
   /// Carga/re-carga la lista de citas desde el servicio
   Future<void> _loadAppointments() async {
@@ -71,7 +72,7 @@ class _CitasScreenState extends State<CitasScreen> {
             ),
             SizedBox(height: 10),
             Expanded(
-              child: FutureBuilder<List<Map<String, dynamic>>>(
+              child: FutureBuilder<List<Appointment>>(
                 future: _appointmentsFuture,
                 builder: ((context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -107,7 +108,7 @@ class _CitasScreenState extends State<CitasScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'Fecha: ${appointment['date']}',
+                                    'Fecha: ${appointment.date}',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 24,
@@ -127,7 +128,7 @@ class _CitasScreenState extends State<CitasScreen> {
                                                         context,
                                                       ) => ActualizarCita(
                                                         idAppointment:
-                                                            appointment['id'],
+                                                            appointment.id!,
                                                       ),
                                                 ),
                                               );
@@ -144,7 +145,7 @@ class _CitasScreenState extends State<CitasScreen> {
                                         onPressed: () async {
                                           await Functions.eliminarCita(
                                             context: context,
-                                            idAppointment: appointment['id'],
+                                            idAppointment: appointment.id!,
                                           );
                                           _loadAppointments();
                                         },
@@ -157,7 +158,7 @@ class _CitasScreenState extends State<CitasScreen> {
                                 ],
                               ),
                               Text(
-                                'Hora: ${appointment['time']}',
+                                'Hora: ${appointment.time}',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20,
@@ -165,7 +166,7 @@ class _CitasScreenState extends State<CitasScreen> {
                                 ),
                               ),
                               Text(
-                                'Dirección: ${appointment['address']}',
+                                'Dirección: ${appointment.address}',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20,

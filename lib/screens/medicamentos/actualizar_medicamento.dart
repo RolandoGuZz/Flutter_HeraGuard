@@ -121,14 +121,14 @@ class _ActualizarMedicamentoState extends State<ActualizarMedicamento> {
     MedicineService.getMedicine(idMedicine: widget.idMedicine).then((medicine) {
       if (mounted) {
         setState(() {
-          _nameController.text = medicine['name'] ?? '';
-          _doseController.text = medicine['dose'] ?? '';
-          _durationNumberController.text = medicine['durationNumber'] ?? '';
-          _startDateController.text = medicine['startDate'] ?? '';
-          _specificTimeController.text = medicine['specificTime'] ?? '';
-          _routeInitial = medicine['route'];
-          _frequencyInitial = medicine['frequency'];
-          _durationInitial = medicine['duration'];
+          _nameController.text = medicine.name;
+          _doseController.text = medicine.dose;
+          _durationNumberController.text = medicine.durationNumber;
+          _startDateController.text = medicine.startDate;
+          _specificTimeController.text = medicine.specificTime ?? '';
+          _routeInitial = medicine.route;
+          _frequencyInitial = medicine.frequency;
+          _durationInitial = medicine.duration;
         });
       }
     });

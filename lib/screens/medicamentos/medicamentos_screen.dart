@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:heraguard/functions/functions.dart';
+import 'package:heraguard/models/medicine_model.dart';
 import 'package:heraguard/screens/medicamentos/actualizar_medicamento.dart';
 import 'package:heraguard/services/medicine_service.dart';
 import 'package:heraguard/widgets/appbar_widget.dart';
@@ -40,7 +41,7 @@ class MedicamentosScreen extends StatefulWidget {
 }
 
 class _MedicamentosScreenState extends State<MedicamentosScreen> {
-  late Future<List<Map<String, dynamic>>> _medicationsFuture;
+  late Future<List<Medicine>> _medicationsFuture;
 
   /// Carga/re-carga la lista de medicamentos desde el servicio
   Future<void> _loadMedications() async {
@@ -70,7 +71,7 @@ class _MedicamentosScreenState extends State<MedicamentosScreen> {
             ),
             SizedBox(height: 10),
             Expanded(
-              child: FutureBuilder<List<Map<String, dynamic>>>(
+              child: FutureBuilder<List<Medicine>>(
                 future: _medicationsFuture,
                 builder: ((context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -106,7 +107,7 @@ class _MedicamentosScreenState extends State<MedicamentosScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'Nombre: ${medicine['name']}',
+                                    'Nombre: ${medicine.name}',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 28,
@@ -125,7 +126,7 @@ class _MedicamentosScreenState extends State<MedicamentosScreen> {
                                                       (context) =>
                                                           ActualizarMedicamento(
                                                             idMedicine:
-                                                                medicine['id'],
+                                                                medicine.id!,
                                                           ),
                                                 ),
                                               );
@@ -142,7 +143,7 @@ class _MedicamentosScreenState extends State<MedicamentosScreen> {
                                         onPressed: () async {
                                           await Functions.eliminarMedicamento(
                                             context: context,
-                                            idMedicine: medicine['id'],
+                                            idMedicine: medicine.id!,
                                           );
                                           _loadMedications();
                                         },
@@ -155,7 +156,7 @@ class _MedicamentosScreenState extends State<MedicamentosScreen> {
                                 ],
                               ),
                               Text(
-                                'Dosis: ${medicine['dose']}',
+                                'Dosis: ${medicine.dose}',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
@@ -164,7 +165,7 @@ class _MedicamentosScreenState extends State<MedicamentosScreen> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                'Duración: ${medicine['durationNumber']} ${medicine['duration']}',
+                                'Duración: ${medicine.durationNumber} ${medicine.duration}',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,
@@ -173,7 +174,7 @@ class _MedicamentosScreenState extends State<MedicamentosScreen> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                'Frecuencia: ${medicine['frequency']}',
+                                'Frecuencia: ${medicine.frequency}',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 18,

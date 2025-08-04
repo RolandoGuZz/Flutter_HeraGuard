@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:heraguard/functions/functions.dart';
+import 'package:heraguard/models/appointment_model.dart';
 
-// Servicio para gestionar citas médicas en Firestore.
+/// Servicio para gestionar citas médicas en Firestore utilizando modelos.
 /// Proporciona operaciones CRUD para las citas del usuario autenticado,
 /// almacenadas en la subcolección 'appointments' del documento del usuario.
 
@@ -11,17 +12,16 @@ class AppointmentService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static int _contNoti = 0;
 
-  /// Obtiene todas las citas del usuario actual.
+  /// Obtiene todas las citas del usuario actual como lista de objetos [Appointment].
+  ///
   /// Características:
   /// - Retorna lista vacía si no hay usuario autenticado
-  /// - Cada cita incluye sus datos + ID del documento
+  /// - Cada cita es un objeto [Appointment] con todos sus campos tipados
+  /// - Incluye automáticamente el ID del documento de Firestore
   ///
   /// Retorna:
-  /// [List<Map<String, dynamic>>] donde cada mapa contiene:
-  ///   - Campos de la cita (date, time, doctor, address)
-  ///   - id: ID del documento en Firestore
-  ///   - idNoti: ID de notificación asociada
-  static Future<List<Map<String, dynamic>>> getAppointments() async {
+  /// [Future<List<Appointment>>] Lista de citas con todos sus datos estructurados
+  static Future<List<Appointment>> getAppointments() async {
     final currentUser = _auth.currentUser;
     if (currentUser == null) return [];
 
@@ -33,30 +33,29 @@ class AppointmentService {
             .get();
 
     return snapshot.docs.map((doc) {
-      final data = doc.data();
-      data['id'] = doc.id;
-      return data;
+      return Appointment.fromMap(doc.data(), doc.id);
     }).toList();
   }
 
-  /// Obtiene una cita específica por su ID.
+  /// Obtiene una cita específica por su ID como objeto [Appointment].
+  ///
   /// Parámetros:
-  /// - idAppointment: ID del documento de la cita
-  /// 
+  /// - idAppointment: ID del documento de la cita en Firestore
+  ///
   /// Lanza:
-  /// Exception si:
+  /// [Exception] si:
   ///   - No hay usuario autenticado
   ///   - La cita no existe
   ///
   /// Retorna:
-  /// - [Map<String, dynamic>] con los datos de la cita + ID del documento
-  static Future<Map<String, dynamic>> getAppointment({
+  /// [Future<Appointment>] Objeto completo de la cita con todos sus campos tipados
+  static Future<Appointment> getAppointment({
     required String idAppointment,
   }) async {
     final currentUser = _auth.currentUser;
     if (currentUser == null) throw Exception("Usuario no autenticado");
 
-    final appointment =
+    final doc =
         await _firestore
             .collection('users')
             .doc(currentUser.uid)
@@ -64,57 +63,47 @@ class AppointmentService {
             .doc(idAppointment)
             .get();
 
-    if (!appointment.exists) {
-      throw Exception("Cita no encontrada");
-    }
-    return appointment.data() as Map<String, dynamic>;
+    if (!doc.exists) throw Exception("Cita no encontrada");
+
+    return Appointment.fromMap(doc.data()!, doc.id);
   }
 
-   /// Agrega una nueva cita médica.
+  /// Agrega una nueva cita médica utilizando el modelo [Appointment].
+  ///
   /// Comportamiento:
   /// 1. Valida usuario autenticado
-  /// 2. Genera ID de notificación único
+  /// 2. Asigna ID de notificación único
   /// 3. Guarda en Firestore
   /// 4. Programa notificación local
   ///
   /// Parámetros:
-  /// - date: Fecha en formato 'YYYY-MM-DD'
-  /// - time: Hora en formato 'HH:MM'
-  /// - doctor: Nombre del médico (opcional)
-  /// - address: Dirección de la cita
+  /// - appointment: Objeto [Appointment] con los datos de la cita
+  ///   (el campo [idNoti] será sobrescrito por el servicio)
   ///
   /// Lanza:
-  /// - Exception si no hay usuario autenticado
-  static Future<void> addAppointment({
-    required String date,
-    required String time,
-    required String? doctor,
-    required String address,
-  }) async {
+  /// [Exception] si no hay usuario autenticado
+  static Future<void> addAppointment(Appointment appointment) async {
     final currentUser = _auth.currentUser;
     if (currentUser == null) throw Exception('Usuario no autenticado');
-    int idNoti = _contNoti++;
+
+    final newAppointment = appointment.copyWith(idNoti: _contNoti++);
+
     await _firestore
         .collection('users')
         .doc(currentUser.uid)
         .collection('appointments')
-        .add({
-          'idNoti': idNoti,
-          'date': date,
-          'time': time,
-          'doctor': doctor,
-          'address': address,
-        });
+        .add(newAppointment.toMap());
 
     await Functions.programarNotificacionesDeCitas();
   }
 
   /// Elimina una cita existente.
+  ///
   /// Parámetros:
   /// - idAppointment: ID del documento a eliminar
   ///
   /// Lanza:
-  /// - Exception si no hay usuario autenticado
+  /// [Exception] si no hay usuario autenticado
   static Future<void> deleteAppointment({required String idAppointment}) async {
     final currentUser = _auth.currentUser;
     if (currentUser == null) throw Exception('Usuario no autenticado');
@@ -127,26 +116,29 @@ class AppointmentService {
         .delete();
   }
 
-  /// Actualiza los datos de una cita existente.
+  /// Actualiza los datos de una cita existente utilizando el modelo [Appointment].
   ///
   /// Parámetros:
-  /// - idAppointment: ID del documento a actualizar
-  /// - data: Mapa con campos a modificar
-  /// 
+  /// - appointment: Objeto [Appointment] completo con los datos actualizados
+  ///   (debe incluir el ID del documento en Firestore)
+  ///
   /// Lanza:
-  /// - Exception si no hay usuario autenticado
-  static Future<void> updateAppointment({
-    required String idAppointment,
-    required Map<String, dynamic> data,
-  }) async {
+  /// [Exception] si:
+  ///   - No hay usuario autenticado
+  ///   - El objeto no tiene ID
+  static Future<void> updateAppointment(Appointment appointment) async {
     final currentUser = _auth.currentUser;
     if (currentUser == null) throw Exception('Usuario no autenticado');
+
+    if (appointment.id == null) {
+      throw Exception('ID de cita no proporcionado');
+    }
 
     await _firestore
         .collection('users')
         .doc(currentUser.uid)
         .collection('appointments')
-        .doc(idAppointment)
-        .update(data);
+        .doc(appointment.id)
+        .update(appointment.toMap());
   }
 }

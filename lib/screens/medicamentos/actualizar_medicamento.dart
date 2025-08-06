@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:heraguard/controllers/medicine_controller.dart';
 import 'package:heraguard/functions/functions.dart';
 import 'package:heraguard/services/medicine_service.dart';
 import 'package:heraguard/widgets/appbar_widget.dart';
 import 'package:heraguard/widgets/custom_text_field.dart';
 import 'package:heraguard/widgets/drop_down_button_widget.dart';
+import 'package:provider/provider.dart';
 
 /// Pantalla para modificar los datos de un medicamento existente.
 /// Precarga la información actual del medicamento y permite su actualización mediante un formulario validado.
@@ -238,18 +240,26 @@ class _ActualizarMedicamentoState extends State<ActualizarMedicamento> {
                     child: ElevatedButton(
                       onPressed:
                           _formValid()
-                              ? () => Functions.actualizarMedicamento(
-                                context: context,
-                                idMedicine: widget.idMedicine,
-                                routeValue: _routeInitial,
-                                nameController: _nameController,
-                                doseController: _doseController,
-                                frequencyValue: _frequencyInitial,
-                                specificTimeController: _specificTimeController,
-                                durationValue: _durationInitial,
-                                durationController: _durationNumberController,
-                                startDateController: _startDateController,
-                              )
+                              ? () async {
+                                final controller =
+                                    Provider.of<MedicineController>(
+                                      context,
+                                      listen: false,
+                                    );
+                                await controller.updateMedicine(
+                                  context: context,
+                                  idMedicine: widget.idMedicine,
+                                  routeValue: _routeInitial,
+                                  nameController: _nameController,
+                                  doseController: _doseController,
+                                  frequencyValue: _frequencyInitial,
+                                  specificTimeController:
+                                      _specificTimeController,
+                                  durationValue: _durationInitial,
+                                  durationController: _durationNumberController,
+                                  startDateController: _startDateController,
+                                );
+                              }
                               : null,
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 15),

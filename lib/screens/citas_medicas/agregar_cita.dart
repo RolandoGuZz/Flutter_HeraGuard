@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:heraguard/functions/functions.dart';
+import 'package:heraguard/controllers/appointment_controller.dart';
 import 'package:heraguard/widgets/appbar_widget.dart';
 import 'package:heraguard/widgets/custom_text_field.dart';
+import 'package:provider/provider.dart';
 
 /// Pantalla de formulario para el registro de nuevas citas médicas en el sistema.
 /// Captura información esencial como fecha, hora, doctor (opcional) y dirección.
@@ -120,13 +122,20 @@ class _AgregarCitaState extends State<AgregarCita> {
                     child: ElevatedButton(
                       onPressed:
                           _formCitaValido()
-                              ? () => Functions.guardarCita(
-                                context: context,
-                                dateController: _dateController,
-                                timeController: _timeController,
-                                doctorController: _doctorController,
-                                addressController: _addressController,
-                              )
+                              ? () async {
+                                final controller =
+                                    Provider.of<AppointmentController>(
+                                      context,
+                                      listen: false,
+                                    );
+                                await controller.saveAppointment(
+                                  context: context,
+                                  dateController: _dateController,
+                                  timeController: _timeController,
+                                  doctorController: _doctorController,
+                                  addressController: _addressController,
+                                );
+                              }
                               : null,
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 15),

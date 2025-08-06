@@ -31,12 +31,12 @@ class MyRoutes {
 
   /// Lista de rutas protegidas que requieren autenticación.
   static final List<MenuOptions> privateRoutes = [
-    // MenuOptions(
-    //   icon: Icons.home,
-    //   option: 'Home',
-    //   ruta: 'home',
-    //   screen: HomeScreen(),
-    // ),
+    MenuOptions(
+      icon: Icons.home,
+      option: 'Home',
+      ruta: 'home',
+      screen: HomeScreen(),
+    ),
     MenuOptions(
       icon: Icons.date_range_rounded,
       option: 'Citas Médicas',

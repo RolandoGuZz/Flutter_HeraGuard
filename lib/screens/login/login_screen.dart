@@ -147,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Column(
                   children: [
                     Text(
-                      "Bienvenido a Heraguard",
+                      "Bienvenido a HeraGuard",
                       style: TextStyle(
                         fontSize: 35,
                         color: Color.fromRGBO(35, 150, 230, 1),

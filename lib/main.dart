@@ -1,9 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:heraguard/controllers/medicine_controller.dart';
 import 'package:heraguard/firebase_options.dart';
 import 'package:heraguard/routes/my_routes.dart';
 import 'package:heraguard/screens/splash_screen.dart';
 import 'package:heraguard/services/notification_service.dart';
+import 'package:provider/provider.dart';
+import 'package:heraguard/controllers/appointment_controller.dart';
 
 /// Archivo principal de la aplicación.
 /// Realiza las siguientes inicializaciones:
@@ -17,7 +20,28 @@ Future<void> main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await NotificationService.initialize();
   await NotificationService.requestPermissions();
-  runApp(const MyApp());
+  runApp(const AppProvider());
+}
+
+class AppProvider extends StatelessWidget {
+  const AppProvider({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => AppointmentController(),
+          lazy: false,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => MedicineController(),
+          lazy: false,
+        ),
+      ],
+      child: const MyApp(),
+    );
+  }
 }
 
 /// Widget raíz de la aplicación que configura el MaterialApp.
@@ -36,7 +60,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'HeraGuard',
       home: SplashScreen(),
-      //initialRoute: MyRoutes.initialRoute,
       routes: MyRoutes.allRoutes(),
     );
   }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:heraguard/controllers/medicine_controller.dart';
 import 'package:heraguard/functions/functions.dart';
 import 'package:heraguard/widgets/appbar_widget.dart';
 import 'package:heraguard/widgets/custom_text_field.dart';
 import 'package:heraguard/widgets/drop_down_button_widget.dart';
+import 'package:provider/provider.dart';
 
 /// Pantalla de formulario para el registro de nuevos medicamentos en el sistema.
 /// Captura toda la información necesaria incluyendo nombre, dosis, frecuencia, vía de administración y duración del tratamiento.
@@ -48,7 +50,7 @@ class _AgregarMedicamentoState extends State<AgregarMedicamento> {
   String? _frequencyInitial;
   String? _durationInitial;
 
-  /// Maneja la selección de los dropdowns 
+  /// Maneja la selección de los dropdowns
   void selectRoute(String? value) {
     setState(() {
       _routeInitial = value;
@@ -215,17 +217,25 @@ class _AgregarMedicamentoState extends State<AgregarMedicamento> {
                     child: ElevatedButton(
                       onPressed:
                           _formValid()
-                              ? () => Functions.guardarMedicamento(
-                                context: context,
-                                routeValue: _routeInitial,
-                                nameController: _nameController,
-                                doseController: _doseController,
-                                frequencyValue: _frequencyInitial,
-                                specificTimeController: _specificTimeController,
-                                durationValue: _durationInitial,
-                                durationController: _durationNumberController,
-                                startDateController: _startDateController,
-                              )
+                              ? () async {
+                                final controller =
+                                    Provider.of<MedicineController>(
+                                      context,
+                                      listen: false,
+                                    );
+                                await controller.saveMedicine(
+                                  context: context,
+                                  routeValue: _routeInitial,
+                                  nameController: _nameController,
+                                  doseController: _doseController,
+                                  frequencyValue: _frequencyInitial,
+                                  specificTimeController:
+                                      _specificTimeController,
+                                  durationValue: _durationInitial,
+                                  durationController: _durationNumberController,
+                                  startDateController: _startDateController,
+                                );
+                              }
                               : null,
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 15),

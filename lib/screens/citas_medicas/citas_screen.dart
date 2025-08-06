@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:heraguard/functions/functions.dart';
+import 'package:heraguard/controllers/appointment_controller.dart';
 import 'package:heraguard/models/appointment_model.dart';
 import 'package:heraguard/screens/citas_medicas/actualizar_cita.dart';
 import 'package:heraguard/screens/screens.dart';
 import 'package:heraguard/services/appointment_service.dart';
 import 'package:heraguard/widgets/sidebar.dart';
 import 'package:heraguard/widgets/appbar_widget.dart';
+import 'package:provider/provider.dart';
 
 /// Pantalla principal para visualizar y administrar las citas médicas registradas.
 /// Muestra una lista interactiva de citas con capacidad para agregar, editar y eliminar registros.
@@ -124,12 +125,11 @@ class _CitasScreenState extends State<CitasScreen> {
                                                 context,
                                                 MaterialPageRoute(
                                                   builder:
-                                                      (
-                                                        context,
-                                                      ) => ActualizarCita(
-                                                        idAppointment:
-                                                            appointment.id!,
-                                                      ),
+                                                      (context) =>
+                                                          ActualizarCita(
+                                                            idAppointment:
+                                                                appointment.id!,
+                                                          ),
                                                 ),
                                               );
 
@@ -143,7 +143,10 @@ class _CitasScreenState extends State<CitasScreen> {
                                       ),
                                       IconButton(
                                         onPressed: () async {
-                                          await Functions.eliminarCita(
+                                          final controller = Provider.of<
+                                            AppointmentController
+                                          >(context, listen: false);
+                                          await controller.deleteAppointment(
                                             context: context,
                                             idAppointment: appointment.id!,
                                           );

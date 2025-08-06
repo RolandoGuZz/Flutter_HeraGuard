@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:heraguard/functions/functions.dart';
 import 'package:heraguard/models/appointment_model.dart';
 
 /// Servicio para gestionar citas médicas en Firestore utilizando modelos.
@@ -94,7 +93,7 @@ class AppointmentService {
         .collection('appointments')
         .add(newAppointment.toMap());
 
-    await Functions.programarNotificacionesDeCitas();
+    //await Functions.programarNotificacionesDeCitas();
   }
 
   /// Elimina una cita existente.

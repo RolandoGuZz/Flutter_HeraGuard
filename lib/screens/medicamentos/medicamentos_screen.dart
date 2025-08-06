@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:heraguard/functions/functions.dart';
+import 'package:heraguard/controllers/medicine_controller.dart';
 import 'package:heraguard/models/medicine_model.dart';
 import 'package:heraguard/screens/medicamentos/actualizar_medicamento.dart';
 import 'package:heraguard/services/medicine_service.dart';
 import 'package:heraguard/widgets/appbar_widget.dart';
 import 'package:heraguard/widgets/sidebar.dart';
 import 'package:heraguard/screens/screens.dart';
+import 'package:provider/provider.dart';
 
 /// Pantalla principal para la visualización y gestión de medicamentos registrados.
 /// Muestra una lista interactiva de medicamentos con capacidad para agregar, editar y eliminar registros.
@@ -141,9 +142,15 @@ class _MedicamentosScreenState extends State<MedicamentosScreen> {
                                       ),
                                       IconButton(
                                         onPressed: () async {
-                                          await Functions.eliminarMedicamento(
+                                          final controller =
+                                              Provider.of<MedicineController>(
+                                                context,
+                                                listen: false,
+                                              );
+                                          await controller.deleteMedicine(
                                             context: context,
                                             idMedicine: medicine.id!,
+                                            idNoti: medicine.idNotiM,
                                           );
                                           _loadMedications();
                                         },

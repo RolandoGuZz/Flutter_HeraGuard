@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:heraguard/controllers/appointment_controller.dart';
 import 'package:heraguard/functions/functions.dart';
 import 'package:heraguard/services/appointment_service.dart';
 import 'package:heraguard/widgets/appbar_widget.dart';
 import 'package:heraguard/widgets/custom_text_field.dart';
-// import 'package:heraguard/models/appointment.dart';
+import 'package:provider/provider.dart';
 
 /// Pantalla para modificar los datos de una cita existente.
 /// Precarga la información actual de la cita y permite su actualización mediante un formulario validado.
@@ -141,14 +142,21 @@ class _ActualizarCitaState extends State<ActualizarCita> {
                     child: ElevatedButton(
                       onPressed:
                           _formCitaValido()
-                              ? () => Functions.actualizarCita(
-                                context: context,
-                                idAppointment: widget.idAppointment,
-                                dateController: _dateController,
-                                timeController: _timeController,
-                                doctorController: _doctorController,
-                                addressController: _addressController,
-                              )
+                              ? () async {
+                                final controller =
+                                    Provider.of<AppointmentController>(
+                                      context,
+                                      listen: false,
+                                    );
+                                await controller.updateAppointment(
+                                  context: context,
+                                  idAppointment: widget.idAppointment,
+                                  dateController: _dateController,
+                                  timeController: _timeController,
+                                  doctorController: _doctorController,
+                                  addressController: _addressController,
+                                );
+                              }
                               : null,
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 15),
